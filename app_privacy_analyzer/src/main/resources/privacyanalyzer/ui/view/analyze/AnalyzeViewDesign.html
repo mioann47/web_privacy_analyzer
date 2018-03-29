@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;GENERATE_GETTERS&quot;:false,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;apptheme&quot;}">
+  <meta name="vaadin-version" content="8.0.5">
+  <meta name="package-mapping" content="privacyanalyzer_ui_view_dashboard:privacyanalyzer.ui.view.dashboard">
+ </head>
+ <body>
+  <vaadin-vertical-layout responsive size-auto>
+   <vaadin-upload button-caption="Upload APK" responsive accept=".apk" _id="upload" :center></vaadin-upload>
+   <vaadin-progress-bar indeterminate width="135px" height="20px" _id="progressBar" :center></vaadin-progress-bar>
+   <vaadin-label visible="false" style-name="colored huge" responsive plain-text _id="malwareStatus" :center></vaadin-label>
+   <vaadin-absolute-layout width="721px" height="62px" :center>
+    <vaadin-label width="136px" height="26px" plain-text _id="nameLabel" :top="0px" :left="0px">
+      Application Name: 
+    </vaadin-label>
+    <vaadin-text-field enabled="false" responsive width="578px" height="26px" _id="nameField" :top="0px" :left="136px"></vaadin-text-field>
+    <vaadin-label width="114px" height="26px" plain-text _id="packageName" :top="36px" :left="0px">
+      Package Name: 
+    </vaadin-label>
+    <vaadin-text-field enabled="false" responsive width="578px" height="26px" _id="packageNameField" :top="36px" :left="136px"></vaadin-text-field>
+   </vaadin-absolute-layout>
+   <vaadin-absolute-layout width="717px" height="102px" :center>
+    <vaadin-label width="171px" height="26px" plain-text _id="packageVersionName" :top="0px" :left="0px">
+      Package Version Name: 
+    </vaadin-label>
+    <vaadin-text-field enabled="false" responsive width="307px" height="26px" _id="packageVersionNameField" :top="0px" :left="171px"></vaadin-text-field>
+    <vaadin-label width="165px" height="26px" plain-text _id="packageVersionCode" :top="37px" :left="0px">
+      Package Version Code: 
+    </vaadin-label>
+    <vaadin-text-field enabled="false" responsive width="307px" height="26px" _id="packageVersionCodeField" :top="37px" :left="171px"></vaadin-text-field>
+    <vaadin-label width="109px" height="26px" plain-text _id="minSDK" :top="0px" :left="497px">
+      Minimum SDK: 
+    </vaadin-label>
+    <vaadin-text-field enabled="false" responsive width="93px" height="26px" _id="minSDKField" :top="1px" :left="621px"></vaadin-text-field>
+    <vaadin-label width="88px" height="26px" plain-text _id="targetSDK" :top="34px" :left="497px">
+      Target SDK: 
+    </vaadin-label>
+    <vaadin-text-field enabled="false" responsive width="93px" height="26px" _id="minSDKField1" :top="35px" :left="621px"></vaadin-text-field>
+    <vaadin-label width="105px" height="26px" plain-text _id="sha256" :top="74px" :left="2px">
+      SHA256 Hash: 
+    </vaadin-label>
+    <vaadin-text-field enabled="false" responsive width="607px" height="26px" _id="sha256Field" :top="74px" :left="107px"></vaadin-text-field>
+   </vaadin-absolute-layout>
+   <vaadin-vertical-layout responsive :center>
+    <vaadin-grid caption="Permissions declared in apk" responsive height="200px" selection-mode="none" _id="declaredPermissionsGrid" :center></vaadin-grid>
+    <vaadin-grid caption="Permissions not declared but used in apk" responsive height="200px" selection-mode="none" _id="notDeclaredButUsedPermissionsGrid" :center></vaadin-grid>
+    <vaadin-grid caption="Permissions declared and used in apk" responsive height="200px" selection-mode="none" _id="declaredAndUsedPermissionsGrid1" :center></vaadin-grid>
+    <vaadin-grid caption="Permissions declared and not used in apk" responsive height="200px" selection-mode="none" _id="declaredAndNotUsedPermissionsGrid11" :center></vaadin-grid>
+   </vaadin-vertical-layout>
+  </vaadin-vertical-layout>
+ </body>
+</html>
