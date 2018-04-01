@@ -1,15 +1,20 @@
 package privacyanalyzer.backend.data.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
+import javax.persistence.JoinColumn;
 
 @Entity(name = "ApkInfo")
-public class ApkModel extends AbstractEntity{
+public class ApkModel extends MyAbstractEntity{
 	
 	
 	@NotNull
@@ -42,6 +47,10 @@ public class ApkModel extends AbstractEntity{
 	
 	@ManyToOne
 	private User user;
+	
+	/*@ManyToMany
+	@JoinTable(name = "apk_permission",joinColumns = @JoinColumn(name="apk_id"),inverseJoinColumns = @JoinColumn(name="permission_id"))
+	private List<Permission> permissions;*/
 	
 	/**
 	 * 

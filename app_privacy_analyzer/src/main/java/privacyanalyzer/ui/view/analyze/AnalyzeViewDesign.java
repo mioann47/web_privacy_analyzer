@@ -43,6 +43,8 @@ public class AnalyzeViewDesign extends VerticalLayout {
 	protected Grid notDeclaredButUsedPermissionsGrid;
 	protected Grid declaredAndUsedPermissionsGrid1;
 	protected Grid declaredAndNotUsedPermissionsGrid11;
+	protected Grid callsGrid;
+	protected Grid trackersGrid;
 
 	public AnalyzeViewDesign() {
 		Design.read(this);

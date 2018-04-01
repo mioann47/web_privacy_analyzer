@@ -14,10 +14,13 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
 
-import privacyanalyzer.backend.data.Permission;
+import privacyanalyzer.backend.data.PermissionMethodCallModel;
 import privacyanalyzer.backend.data.Role;
+import privacyanalyzer.backend.data.Tracker;
 import privacyanalyzer.backend.data.entity.ApkModel;
+import privacyanalyzer.backend.data.entity.Permission;
 import privacyanalyzer.backend.service.PermissionService;
+import privacyanalyzer.backend.service.TrackerService;
 import privacyanalyzer.backend.service.UploadService;
 import privacyanalyzer.ui.navigation.NavigationManager;
 import privacyanalyzer.ui.view.about.AboutView;
@@ -27,6 +30,9 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 	
 	@Autowired
 	public PermissionService permissionService;
+	
+	@Autowired
+	public TrackerService trackerService;
 	
 	private final NavigationManager navigationManager;
 	private final UploadService uploadService;
@@ -48,6 +54,8 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 		notDeclaredButUsedPermissionsGrid.setVisible(false);
 		declaredAndNotUsedPermissionsGrid11.setVisible(false);
 		declaredAndUsedPermissionsGrid1.setVisible(false);
+		trackersGrid.setVisible(false);
+		callsGrid.setVisible(false);
 		progressBar.setVisible(false);
 		showApkInformation(false);
 		setWidth("100%");
@@ -89,6 +97,14 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 		return declaredAndNotUsedPermissionsGrid11;
 	}
 	
+	public Grid<Tracker> getTrackersGrid(){
+		return trackersGrid;
+	}
+	
+	public Grid<PermissionMethodCallModel> getCallsGrid(){
+		return callsGrid;
+	}
+	
 	public Label getMalwareLabel() {
 		return malwareStatus;
 	}
@@ -109,6 +125,7 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 		minSDKField1.setVisible(value);
 		sha256.setVisible(value);
 		sha256Field.setVisible(value);
+		
 		
 	}
 }

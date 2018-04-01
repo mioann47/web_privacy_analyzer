@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -18,6 +20,7 @@ import com.vaadin.ui.Upload.SucceededListener;
 
 import privacyanalyzer.backend.data.ApplicationPermissionsModel;
 import privacyanalyzer.backend.data.LibraryModel;
+import privacyanalyzer.backend.data.PermissionMethodCallModel;
 import privacyanalyzer.backend.data.entity.ApkModel;
 import privacyanalyzer.functionalities.APKAnalyzer;
 import privacyanalyzer.functionalities.MalwarePrediction;
@@ -94,10 +97,7 @@ public class UploadService implements Receiver, SucceededListener {
 			aView.permissionService.setGrid(apm.getRequiredAndUsed(), aView.getDeclaredAndUsedPermissionsGrid());
 			aView.permissionService.setGrid(apm.getRequiredButNotUsed(), aView.getDeclaredAndNotUsedPermissionsGrid());
 
-			LibraryModel[] libModels = apkanalyzer.getLibrariesPermissions(file.getAbsolutePath());
-			//for (int i = 0; i < libModels.length; i++) {
-				//System.out.println(libModels[i].getLibrary());
-			//}
+
 
 			Classifier cls = (Classifier) weka.core.SerializationHelper.read(Paths.wekaModelPath);
 			MalwarePrediction malpred = new MalwarePrediction(cls, apm.getDeclared());
@@ -111,8 +111,23 @@ public class UploadService implements Receiver, SucceededListener {
 			}
 			aView.getMalwareLabel().setVisible(true);
 
+			
+			
 			// System.out.println(apm.getDeclared().toString());
-
+			LibraryModel[] libModels = apkanalyzer.getLibrariesPermissions(file.getAbsolutePath());
+			//for (int i = 0; i < libModels.length; i++) {
+				//System.out.println(libModels[i].getLibrary());
+			//}
+			
+			aView.trackerService.setGrid(libModels, aView.getTrackersGrid());
+			ArrayList<String> usedpermissionsList= new ArrayList<String>();
+			usedpermissionsList.addAll(apm.getRequiredAndUsed());
+			usedpermissionsList.addAll(apm.getNotRequiredButUsed());
+			ArrayList<PermissionMethodCallModel> calllist=apkanalyzer.getCalls(file.getAbsolutePath(), usedpermissionsList);
+			
+			aView.trackerService.setGrid(calllist, aView.getCallsGrid());
+			
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

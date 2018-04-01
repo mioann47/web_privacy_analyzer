@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Tracker implements Serializable {
 
-	private int id;
+	private Long id;
 	private String website;
 	private String name;
 	private String code_signature;
@@ -13,7 +13,6 @@ public class Tracker implements Serializable {
 	 * 
 	 */
 	public Tracker() {
-		super();
 	}
 
 	/**
@@ -22,19 +21,18 @@ public class Tracker implements Serializable {
 	 * @param name
 	 * @param code_signature
 	 */
-	public Tracker(int id, String website, String name, String code_signature) {
-		super();
+	public Tracker(Long id, String website, String name, String code_signature) {
 		this.id = id;
 		this.website = website;
 		this.name = name;
 		this.code_signature = code_signature;
 	}
 
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -61,5 +59,7 @@ public class Tracker implements Serializable {
 	public void setCode_signature(String code_signature) {
 		this.code_signature = code_signature;
 	}
+	
+
 
 }

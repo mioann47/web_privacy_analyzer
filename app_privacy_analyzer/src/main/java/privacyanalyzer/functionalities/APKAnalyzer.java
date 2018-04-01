@@ -114,17 +114,18 @@ public class APKAnalyzer {
 		}
 
 		String x = sb.toString();
-		// System.out.println(x);
+		//System.out.println(x);
 		Gson g = new Gson();
 		ArrayList<PermissionMethodCallModel> calls = g.fromJson(x,
 				new TypeToken<ArrayList<PermissionMethodCallModel>>() {
 				}.getType());
-
+		if (calls==null) return null;
 		return uniqueList(calls);
 
 	}
 
 	private ArrayList<PermissionMethodCallModel> uniqueList(ArrayList<PermissionMethodCallModel> list) {
+		if (list==null) return null;
 		ArrayList<PermissionMethodCallModel> x = new ArrayList<PermissionMethodCallModel>();
 		for (PermissionMethodCallModel pmc : list) {
 			if (!x.contains(pmc)) {

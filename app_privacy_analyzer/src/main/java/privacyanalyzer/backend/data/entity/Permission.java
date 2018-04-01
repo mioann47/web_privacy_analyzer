@@ -1,15 +1,40 @@
-package privacyanalyzer.backend.data;
+package privacyanalyzer.backend.data.entity;
 
 import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+
 
 public class Permission implements Serializable{
 
+	 @Id
 	 private Long id;
+	 
+	 @Column(name="permissionName",unique = true)
 	 private String permissionName;
+	 
+	 @Column(name="permissionDesc")
 	 private String  permissionDesc;
+	 
+	 @Column(name="protectionLevel")
 	 private String  protectionLevel;
+	 
+	 @Column(name="permissionValue",unique = true)
 	 private String  permissionValue;
+	 
 	 private String  levelDesc;
+	 
+	 /*@ManyToMany
+	 @JoinTable(name = "apk_permission",joinColumns = @JoinColumn(name="permission_id"),inverseJoinColumns = @JoinColumn(name="apk_id"))
+	 private List<ApkModel> apks;*/
+	 
 	/**
 	 * @param id
 	 * @param permissionName

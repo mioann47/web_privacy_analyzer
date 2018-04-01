@@ -11,11 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import privacyanalyzer.app.security.SecurityUtils;
 import privacyanalyzer.backend.ApkRepository;
-
+import privacyanalyzer.backend.data.Role;
 import privacyanalyzer.backend.data.entity.ApkModel;
+import privacyanalyzer.backend.data.entity.User;
 
 @Service
-public class ApkService extends CrudService<ApkModel> {
+public class ApkService extends MyCrudService<ApkModel> {
 
 	private final ApkRepository apkRepository;
 	private final UserService userService;
@@ -35,8 +36,10 @@ public class ApkService extends CrudService<ApkModel> {
 	@Override
 	@Transactional
 	public ApkModel save(ApkModel apk) {
-		
-		apk.setUser(SecurityUtils.getCurrentUser(userService));
+		User current=SecurityUtils.getCurrentUser(userService);
+		if (!current.getRole().equals(Role.GUEST)) {
+		apk.setUser(current);
+		}
 		return getRepository().save(apk);
 	}
 	
