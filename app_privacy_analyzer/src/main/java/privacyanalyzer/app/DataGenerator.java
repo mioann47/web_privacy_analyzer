@@ -1,5 +1,9 @@
 package privacyanalyzer.app;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -10,14 +14,20 @@ import java.util.Random;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import privacyanalyzer.backend.ApkRepository;
 import privacyanalyzer.backend.OrderRepository;
+import privacyanalyzer.backend.PermissionRepository;
 import privacyanalyzer.backend.PickupLocationRepository;
 import privacyanalyzer.backend.ProductRepository;
+import privacyanalyzer.backend.ProtectionLevelRepository;
 import privacyanalyzer.backend.UserRepository;
 import privacyanalyzer.backend.data.OrderState;
 import privacyanalyzer.backend.data.Role;
@@ -25,8 +35,10 @@ import privacyanalyzer.backend.data.entity.Customer;
 import privacyanalyzer.backend.data.entity.HistoryItem;
 import privacyanalyzer.backend.data.entity.Order;
 import privacyanalyzer.backend.data.entity.OrderItem;
+import privacyanalyzer.backend.data.entity.Permission;
 import privacyanalyzer.backend.data.entity.PickupLocation;
 import privacyanalyzer.backend.data.entity.Product;
+import privacyanalyzer.backend.data.entity.ProtectionLevel;
 import privacyanalyzer.backend.data.entity.User;
 
 @SpringComponent
@@ -56,6 +68,8 @@ public class DataGenerator implements HasLogger {
 			UserRepository userRepository,
 			ProductRepository productRepository, 
 			PickupLocationRepository pickupLocationRepository,ApkRepository apkRepository,
+			PermissionRepository permissionRepository,
+			ProtectionLevelRepository protectionLevelRepository,
 			PasswordEncoder passwordEncoder) {
 		return args -> {
 			if (hasData(userRepository)) {
@@ -63,18 +77,61 @@ public class DataGenerator implements HasLogger {
 				return;
 			}
 
+			
+			
 			getLogger().info("Generating demo data");
 			getLogger().info("... generating users");
 			createUsers(userRepository, passwordEncoder);
+			/*
 			getLogger().info("... generating products");
 			createProducts(productRepository);
 			getLogger().info("... generating pickup locations");
 			createPickupLocations(pickupLocationRepository);
 			getLogger().info("... generating orders");
-			createOrders(orderRepository);
-			apkRepository.count();
+			createOrders(orderRepository);*/
+			//apkRepository.count();
+			
+			
+			getLogger().info("... loading protection levels");
+			createProtectionLevels(protectionLevelRepository);
+			
+			
+			getLogger().info("... loading permissions");
+			createPermissions(permissionRepository,protectionLevelRepository);
+			
+			
 			getLogger().info("Generated demo data");
 		};
+	}
+
+	private void createProtectionLevels(ProtectionLevelRepository protectionLevelRepository) throws IOException {
+		File file = new ClassPathResource("protectionlevels.json").getFile();
+		Gson gson = new Gson();
+		JsonReader reader = new JsonReader(new FileReader(file));
+		List<ProtectionLevel> data = gson.fromJson(reader, new TypeToken<List<ProtectionLevel>>() {
+		}.getType());
+
+		for (ProtectionLevel p:data) {
+			protectionLevelRepository.save(p);
+		}
+		
+		
+		
+	}
+
+	private void createPermissions(PermissionRepository permissionRepository,ProtectionLevelRepository protectionLevelRepository) throws IOException {
+		File file = new ClassPathResource("permissions.json").getFile();
+		Gson gson = new Gson();
+		JsonReader reader = new JsonReader(new FileReader(file));
+		List<Permission> data = gson.fromJson(reader, new TypeToken<List<Permission>>() {
+		}.getType());
+
+		for (Permission p:data) {
+		p.setProtectionlvl(protectionLevelRepository.findByName(p.getProtectionLevel()));
+			permissionRepository.save(p);
+		}
+		
+
 	}
 
 	private boolean hasData(UserRepository userRepository) {

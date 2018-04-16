@@ -45,6 +45,12 @@ public class ApkModel extends MyAbstractEntity{
 	@NotNull
 	private String appName;
 	
+	@NotNull
+	private boolean isMalware;
+	
+
+
+
 	@ManyToOne
 	private User user;
 	
@@ -123,7 +129,14 @@ public class ApkModel extends MyAbstractEntity{
 	public void setUser(User addedBy) {
 		this.user = addedBy;
 	}
+	public boolean isMalware() {
+		return isMalware;
+	}
 
+
+	public void setMalware(boolean isMalware) {
+		this.isMalware = isMalware;
+	}
 	
 
 }

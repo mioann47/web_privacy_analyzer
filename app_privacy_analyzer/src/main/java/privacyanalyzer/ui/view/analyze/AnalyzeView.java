@@ -16,9 +16,9 @@ import com.vaadin.ui.Upload;
 
 import privacyanalyzer.backend.data.PermissionMethodCallModel;
 import privacyanalyzer.backend.data.Role;
-import privacyanalyzer.backend.data.Tracker;
 import privacyanalyzer.backend.data.entity.ApkModel;
 import privacyanalyzer.backend.data.entity.Permission;
+import privacyanalyzer.backend.data.entity.Tracker;
 import privacyanalyzer.backend.service.PermissionService;
 import privacyanalyzer.backend.service.TrackerService;
 import privacyanalyzer.backend.service.UploadService;

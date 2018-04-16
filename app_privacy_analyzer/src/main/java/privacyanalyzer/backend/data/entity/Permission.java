@@ -9,27 +9,35 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@Entity(name="permissions")
+public class Permission extends MyAbstractEntity{
 
 
-public class Permission implements Serializable{
-
-	 @Id
-	 private Long id;
 	 
-	 @Column(name="permissionName",unique = true)
+	 
 	 private String permissionName;
 	 
-	 @Column(name="permissionDesc")
+	 @Column(columnDefinition = "TEXT")
 	 private String  permissionDesc;
 	 
-	 @Column(name="protectionLevel")
+	 @JsonInclude()
+	 @Transient
 	 private String  protectionLevel;
 	 
-	 @Column(name="permissionValue",unique = true)
+	 @ManyToOne
+	 private ProtectionLevel protectionlvl;
+	 
+	 @Column(unique = true)
 	 private String  permissionValue;
 	 
-	 private String  levelDesc;
+	public Permission( ) {
+}
 	 
 	 /*@ManyToMany
 	 @JoinTable(name = "apk_permission",joinColumns = @JoinColumn(name="permission_id"),inverseJoinColumns = @JoinColumn(name="apk_id"))
@@ -42,33 +50,27 @@ public class Permission implements Serializable{
 	 * @param protectionLevel
 	 * @param permissionValue
 	 */
-	public Permission(Long id, String permissionName, String permissionDesc, String protectionLevel,
-			String permissionValue,String levelDesc) {
+	public Permission( String permissionName, String permissionDesc, String protectionLevel,
+			String permissionValue) {
 		super();
-		this.id = id;
+		
 		this.permissionName = permissionName;
 		this.permissionDesc = permissionDesc;
 		this.protectionLevel = protectionLevel;
 		this.permissionValue = permissionValue;
-		this.levelDesc=levelDesc;
+		
 	}
 	
 	public Permission(String permissionValue) {
-		super();
-		this.id = (long) -1;
 		
 		this.permissionName =  permissionValue.split("\\.")[permissionValue.split("\\.").length-1];
 		this.permissionDesc =  "Unknown permission";
 		this.protectionLevel = "No information available";
 		this.permissionValue = permissionValue;
-		this.levelDesc = "";
+		this.protectionlvl=null;
+		
 	}
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
+
 	public String getPermissionName() {
 		return permissionName;
 	}
@@ -81,9 +83,12 @@ public class Permission implements Serializable{
 	public void setPermissionDesc(String permissionDesc) {
 		this.permissionDesc = permissionDesc;
 	}
+	 @JsonInclude()
+	 @Transient
 	public String getProtectionLevel() {
 		return protectionLevel;
 	}
+
 	public void setProtectionLevel(String protectionLevel) {
 		this.protectionLevel = protectionLevel;
 	}
@@ -94,12 +99,22 @@ public class Permission implements Serializable{
 		this.permissionValue = permissionValue;
 	}
 
-	public String getLevelDesc() {
-		return levelDesc;
+	public ProtectionLevel getProtectionlvl() {
+		return protectionlvl;
 	}
 
-	public void setLevelDesc(String levelDesc) {
-		this.levelDesc = levelDesc;
+	public void setProtectionlvl(ProtectionLevel protectionlvl) {
+		this.protectionlvl = protectionlvl;
+	}
+
+	public String getProtectionlvlDesc() {
+		if (protectionlvl==null) return "No information available";
+		return protectionlvl.getDescription();
+	}
+	
+	public String getProtectionlvlName() {
+		if (protectionlvl==null) return "No information available";
+		return protectionlvl.getName();
 	}
 	
 	

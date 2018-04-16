@@ -17,4 +17,7 @@ public interface ApkRepository extends JpaRepository<ApkModel, Long> {
 	
 	@Query("select apk from ApkInfo apk where apk.sha256 = :#{[0]}")
 	List<ApkModel> checkIfExists(String hash);
+	
+	ApkModel findBySha256(String sha256);
+	
 }

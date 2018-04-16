@@ -12,26 +12,33 @@ import org.springframework.stereotype.Service;
 
 import com.vaadin.ui.Grid;
 
+import privacyanalyzer.backend.TrackerRepository;
 import privacyanalyzer.backend.data.LibraryModel;
 import privacyanalyzer.backend.data.PermissionMethodCallModel;
-import privacyanalyzer.backend.data.Tracker;
 import privacyanalyzer.backend.data.entity.Permission;
+import privacyanalyzer.backend.data.entity.Tracker;
 
 @Service
 public class TrackerService implements Serializable {
 
-	private List trackerList;
+	
 
+	
+	private List<Tracker> trackerList;
+	
+	private final TrackerRepository trackerRepository;
+	
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	public TrackerService(TrackerRepository trackerRepository) {
+		this.trackerRepository=trackerRepository;
+		getAllTrackers();
+	}
+	
 
-	@PostConstruct
+
+	
 	private void getAllTrackers() {
-
-		trackerList = jdbcTemplate.query("select * from trackers",
-				(rs, rowNum) -> new Tracker(rs.getLong("trackers_properties_id"),
-						rs.getString("trackers_properties_website"), rs.getString("trackers_properties_name"),
-						rs.getString("trackers_properties_code_signature")));
+		trackerList=trackerRepository.findAll();
 
 	}
 
@@ -48,7 +55,7 @@ public class TrackerService implements Serializable {
 		
 		for(Tracker t:getTrackerList()) {
 			
-			if (t.getName().equalsIgnoreCase(name)) {
+			if (t.getTrackersPropertiesName().equalsIgnoreCase(name)) {
 				return t;
 			}
 			
@@ -62,12 +69,7 @@ public class TrackerService implements Serializable {
 		ArrayList<Tracker> mylist=new ArrayList<Tracker>();
 		
 		for (int i = 0; i < libModels.length; i++) {
-			/*System.out.println(libModels[i].getLibrary());
-			System.out.println(">"+libModels[i].getPackage());
-			System.out.println(">"+libModels[i].getStandard_Package());
-			System.out.println(">"+libModels[i].getWebsite());
-			System.out.println(">"+libModels[i].getMatch_Ratio());
-			System.out.println(">"+libModels[i].getType());*/
+			/*System.out.println(libModels[i].getLibrary());*/
 			
 			Tracker t=exists(libModels[i].getLibrary());
 			if (t!=null) {
@@ -78,8 +80,8 @@ public class TrackerService implements Serializable {
 		
 		grid.removeAllColumns();
 		grid.setSelectionMode(Grid.SelectionMode.NONE);
-		grid.addColumn(Tracker::getName).setCaption("Name");
-		grid.addColumn(Tracker::getWebsite).setCaption("Website");
+		grid.addColumn(Tracker::getTrackersPropertiesName).setCaption("Name");
+		grid.addColumn(Tracker::getTrackersPropertiesWebsite).setCaption("Website");
 		grid.setItems(mylist);
 		grid.setWidth("100%");
 

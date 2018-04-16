@@ -32,15 +32,19 @@ import weka.classifiers.Classifier;
 public class UploadService implements Receiver, SucceededListener {
 
 	private final ApkService apkService;
-
+	private final PermissionService permissionService;
+	private final AnalyzeService analyzeService;
+	
 	public File file;
 
 	private File directory;
 	private AnalyzeView aView;
 
 	@Autowired
-	public UploadService(ApkService apkService) {
+	public UploadService(ApkService apkService,PermissionService permissionService,AnalyzeService analyzeService) {
 		this.apkService = apkService;
+		this.permissionService=permissionService;
+		this.analyzeService=analyzeService;
 	}
 
 	public void setView(AnalyzeView v) {
@@ -77,13 +81,22 @@ public class UploadService implements Receiver, SucceededListener {
 	public void uploadSucceeded(SucceededEvent event) {
 		// Show the uploaded file in the image viewer
 		System.out.println("Analyzing " + file.getAbsolutePath());
-		APKAnalyzer apkanalyzer = new APKAnalyzer();
+		//APKAnalyzer apkanalyzer = new APKAnalyzer();
 		ApkModel apkmodel;
+		ApkModel loaded;
+		boolean apkexists;
 		try {
-			apkmodel = apkanalyzer.getApkInformation(file.getAbsolutePath());
-
-			if (apkService.getRepository().checkIfExists(apkmodel).size() > 0) {
+			apkmodel = analyzeService.getApkInformation(file.getAbsolutePath());
+			loaded = apkService.getRepository().findBySha256(apkmodel.getSha256());
+			if (loaded ==null) apkexists=false;
+			else {
+				apkexists=true;
+				apkmodel=loaded;}
+			
+			if (apkexists) {
 				System.out.println("APK already exists");
+				
+				//loaded=apkService.getRepository().checkIfExists(apkmodel).get(0);
 			} else {
 				apkService.save(apkmodel);
 				System.out.println("Adding APK information to DB");
@@ -91,22 +104,62 @@ public class UploadService implements Receiver, SucceededListener {
 			// System.out.println(apkmodel.toString());
 			aView.getProgressBar().setVisible(false);
 			aView.setInfo(apkmodel);
-			ApplicationPermissionsModel apm = apkanalyzer.getAPKPermissions(file.getAbsolutePath());
-			aView.permissionService.setGrid(apm.getDeclared(), aView.getDeclaredPermissionsGrid());
-			aView.permissionService.setGrid(apm.getNotRequiredButUsed(), aView.getNotDeclaredButUsedPermissionsGrid());
-			aView.permissionService.setGrid(apm.getRequiredAndUsed(), aView.getDeclaredAndUsedPermissionsGrid());
-			aView.permissionService.setGrid(apm.getRequiredButNotUsed(), aView.getDeclaredAndNotUsedPermissionsGrid());
+			ApplicationPermissionsModel apm = analyzeService.getAPKPermissions(file.getAbsolutePath());
+			
 
-
-
+			if (!apkexists) {
+			permissionService.saveApkPermissions(apm.getDeclared(), apkmodel, "Declared");
+			permissionService.saveApkPermissions(apm.getNotRequiredButUsed(), apkmodel, "NotRequiredButUsed");
+			permissionService.saveApkPermissions(apm.getRequiredAndUsed(), apkmodel, "RequiredAndUsed");
+			permissionService.saveApkPermissions(apm.getRequiredButNotUsed(), apkmodel, "RequiredButNotUsed");
+			
+			
+			
+			permissionService.setGrid(apm.getDeclared(), aView.getDeclaredPermissionsGrid());
+			permissionService.setGrid(apm.getNotRequiredButUsed(), aView.getNotDeclaredButUsedPermissionsGrid());
+			permissionService.setGrid(apm.getRequiredAndUsed(), aView.getDeclaredAndUsedPermissionsGrid());
+			permissionService.setGrid(apm.getRequiredButNotUsed(), aView.getDeclaredAndNotUsedPermissionsGrid());
+			}else {
+				System.out.println(permissionService.getApkPermissionAssociationRepository().findAllPermissionsByApkModelAndPermissionType(apkmodel, "Declared"));
+			permissionService
+			.setGridbyPermissions
+			(permissionService.
+					getApkPermissionAssociationRepository().
+					findAllPermissionsByApkModelAndPermissionType(apkmodel, "Declared"), aView.getDeclaredPermissionsGrid());
+			
+			
+			permissionService
+			.setGridbyPermissions
+			(permissionService.
+					getApkPermissionAssociationRepository().
+					findAllPermissionsByApkModelAndPermissionType(apkmodel, "NotRequiredButUsed"), aView.getNotDeclaredButUsedPermissionsGrid());
+			
+			permissionService
+			.setGridbyPermissions
+			(permissionService.
+					getApkPermissionAssociationRepository().
+					findAllPermissionsByApkModelAndPermissionType(apkmodel, "RequiredAndUsed"), aView.getDeclaredAndUsedPermissionsGrid());
+			
+			permissionService
+			.setGridbyPermissions
+			(permissionService.
+					getApkPermissionAssociationRepository().
+					findAllPermissionsByApkModelAndPermissionType(apkmodel, "RequiredButNotUsed"), aView.getDeclaredAndNotUsedPermissionsGrid());
+			
+			}
+			
+			
+			System.out.println(analyzeService.predict(apm.getDeclared()));
 			Classifier cls = (Classifier) weka.core.SerializationHelper.read(Paths.wekaModelPath);
 			MalwarePrediction malpred = new MalwarePrediction(cls, apm.getDeclared());
 			if (malpred.predict() == 1) {
-
+				apkmodel.setMalware(true);
+				if (!apkexists) apkService.save(apkmodel);
 				aView.getMalwareLabel().setValue("APK might be a MALWARE");
 
 			} else {
-
+				apkmodel.setMalware(false);
+				if (!apkexists) apkService.save(apkmodel);
 				aView.getMalwareLabel().setValue("No malicous activity detected");
 			}
 			aView.getMalwareLabel().setVisible(true);
@@ -114,7 +167,7 @@ public class UploadService implements Receiver, SucceededListener {
 			
 			
 			// System.out.println(apm.getDeclared().toString());
-			LibraryModel[] libModels = apkanalyzer.getLibrariesPermissions(file.getAbsolutePath());
+			LibraryModel[] libModels = analyzeService.getLibrariesPermissions(file.getAbsolutePath());
 			//for (int i = 0; i < libModels.length; i++) {
 				//System.out.println(libModels[i].getLibrary());
 			//}
@@ -123,7 +176,7 @@ public class UploadService implements Receiver, SucceededListener {
 			ArrayList<String> usedpermissionsList= new ArrayList<String>();
 			usedpermissionsList.addAll(apm.getRequiredAndUsed());
 			usedpermissionsList.addAll(apm.getNotRequiredButUsed());
-			ArrayList<PermissionMethodCallModel> calllist=apkanalyzer.getCalls(file.getAbsolutePath(), usedpermissionsList);
+			ArrayList<PermissionMethodCallModel> calllist=analyzeService.getCalls(file.getAbsolutePath(), usedpermissionsList);
 			
 			aView.trackerService.setGrid(calllist, aView.getCallsGrid());
 			
@@ -135,4 +188,7 @@ public class UploadService implements Receiver, SucceededListener {
 		file.delete();
 
 	}
+	
+
+	
 }
