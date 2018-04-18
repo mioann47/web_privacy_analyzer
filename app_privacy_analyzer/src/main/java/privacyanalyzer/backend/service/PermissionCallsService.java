@@ -61,7 +61,7 @@ public class PermissionCallsService extends MyCrudService<PermissionMethodCallMo
 		List<PermissionMethodCallModel> list=this.permissionCallsRepository.findByApk(apkmodel);
 		grid.removeAllColumns();
 		grid.setSelectionMode(Grid.SelectionMode.NONE);
-		grid.addColumn(PermissionMethodCallModel::getPermissionName).setCaption("Permission Name");
+		grid.addColumn(PermissionMethodCallModel::getName).setCaption("Permission Name");
 		grid.addColumn(PermissionMethodCallModel::getCallerFunction)
 				.setCaption("Caller Function (package -> function)");
 		grid.addColumn(PermissionMethodCallModel::getPermissionFunction)

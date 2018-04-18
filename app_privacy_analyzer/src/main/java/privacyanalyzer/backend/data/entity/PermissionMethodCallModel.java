@@ -43,7 +43,9 @@ public class PermissionMethodCallModel extends MyAbstractEntity{
 
 	}
 
-
+	public String getName() {
+		return permissionName.split("\\.")[permissionName.split("\\.").length-1];
+	}
 
 	public String getPermissionName() {
 		return permissionName;
