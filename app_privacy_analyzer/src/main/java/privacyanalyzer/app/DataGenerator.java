@@ -28,6 +28,7 @@ import privacyanalyzer.backend.PermissionRepository;
 import privacyanalyzer.backend.PickupLocationRepository;
 import privacyanalyzer.backend.ProductRepository;
 import privacyanalyzer.backend.ProtectionLevelRepository;
+import privacyanalyzer.backend.TrackerRepository;
 import privacyanalyzer.backend.UserRepository;
 import privacyanalyzer.backend.data.OrderState;
 import privacyanalyzer.backend.data.Role;
@@ -39,6 +40,7 @@ import privacyanalyzer.backend.data.entity.Permission;
 import privacyanalyzer.backend.data.entity.PickupLocation;
 import privacyanalyzer.backend.data.entity.Product;
 import privacyanalyzer.backend.data.entity.ProtectionLevel;
+import privacyanalyzer.backend.data.entity.Tracker;
 import privacyanalyzer.backend.data.entity.User;
 
 @SpringComponent
@@ -70,6 +72,7 @@ public class DataGenerator implements HasLogger {
 			PickupLocationRepository pickupLocationRepository,ApkRepository apkRepository,
 			PermissionRepository permissionRepository,
 			ProtectionLevelRepository protectionLevelRepository,
+			TrackerRepository trackerRepository,
 			PasswordEncoder passwordEncoder) {
 		return args -> {
 			if (hasData(userRepository)) {
@@ -99,11 +102,29 @@ public class DataGenerator implements HasLogger {
 			getLogger().info("... loading permissions");
 			createPermissions(permissionRepository,protectionLevelRepository);
 			
+			getLogger().info("... loading trackers");
+			createTrackers(trackerRepository);
 			
 			getLogger().info("Generated demo data");
 		};
 	}
 
+	
+	private void createTrackers(TrackerRepository trackerRepository) throws IOException {
+		File file = new ClassPathResource("trackers.json").getFile();
+		Gson gson = new Gson();
+		JsonReader reader = new JsonReader(new FileReader(file));
+		List<Tracker> data = gson.fromJson(reader, new TypeToken<List<Tracker>>() {
+		}.getType());
+
+		for (Tracker t:data) {
+			trackerRepository.save(t);
+		}
+		
+		
+		
+	}
+	
 	private void createProtectionLevels(ProtectionLevelRepository protectionLevelRepository) throws IOException {
 		File file = new ClassPathResource("protectionlevels.json").getFile();
 		Gson gson = new Gson();

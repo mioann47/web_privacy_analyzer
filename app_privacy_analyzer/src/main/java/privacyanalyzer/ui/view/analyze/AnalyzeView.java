@@ -14,10 +14,10 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
 
-import privacyanalyzer.backend.data.PermissionMethodCallModel;
 import privacyanalyzer.backend.data.Role;
 import privacyanalyzer.backend.data.entity.ApkModel;
 import privacyanalyzer.backend.data.entity.Permission;
+import privacyanalyzer.backend.data.entity.PermissionMethodCallModel;
 import privacyanalyzer.backend.data.entity.Tracker;
 import privacyanalyzer.backend.service.PermissionService;
 import privacyanalyzer.backend.service.TrackerService;
@@ -31,8 +31,7 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 	@Autowired
 	public PermissionService permissionService;
 	
-	@Autowired
-	public TrackerService trackerService;
+
 	
 	private final NavigationManager navigationManager;
 	private final UploadService uploadService;

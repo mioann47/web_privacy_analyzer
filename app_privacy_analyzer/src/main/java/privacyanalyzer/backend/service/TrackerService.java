@@ -12,10 +12,13 @@ import org.springframework.stereotype.Service;
 
 import com.vaadin.ui.Grid;
 
+import privacyanalyzer.backend.ApkTrackerAssociationRepository;
 import privacyanalyzer.backend.TrackerRepository;
 import privacyanalyzer.backend.data.LibraryModel;
-import privacyanalyzer.backend.data.PermissionMethodCallModel;
+import privacyanalyzer.backend.data.entity.ApkModel;
+import privacyanalyzer.backend.data.entity.ApkTrackerAssociation;
 import privacyanalyzer.backend.data.entity.Permission;
+import privacyanalyzer.backend.data.entity.PermissionMethodCallModel;
 import privacyanalyzer.backend.data.entity.Tracker;
 
 @Service
@@ -27,10 +30,12 @@ public class TrackerService implements Serializable {
 	private List<Tracker> trackerList;
 	
 	private final TrackerRepository trackerRepository;
+	private final ApkTrackerAssociationRepository apkTrackerAssociationRepository;
 	
 	@Autowired
-	public TrackerService(TrackerRepository trackerRepository) {
+	public TrackerService(TrackerRepository trackerRepository,ApkTrackerAssociationRepository apkTrackerAssociationRepository) {
 		this.trackerRepository=trackerRepository;
+		this.apkTrackerAssociationRepository=apkTrackerAssociationRepository;
 		getAllTrackers();
 	}
 	
@@ -55,7 +60,7 @@ public class TrackerService implements Serializable {
 		
 		for(Tracker t:getTrackerList()) {
 			
-			if (t.getTrackersPropertiesName().equalsIgnoreCase(name)) {
+			if (t.getName().equalsIgnoreCase(name)) {
 				return t;
 			}
 			
@@ -65,23 +70,39 @@ public class TrackerService implements Serializable {
 		return null;
 	}
 	
-	public void setGrid(LibraryModel[] libModels, Grid<Tracker> grid) {
-		ArrayList<Tracker> mylist=new ArrayList<Tracker>();
-		
+	
+	public void saveTrackers(LibraryModel[] libModels,ApkModel apkmodel) {
 		for (int i = 0; i < libModels.length; i++) {
 			/*System.out.println(libModels[i].getLibrary());*/
+			
+			Tracker t=exists(libModels[i].getLibrary());
+			if (t!=null) {
+				apkTrackerAssociationRepository.save(new ApkTrackerAssociation(apkmodel,t));
+			}
+			
+		}
+	}
+	
+	
+	
+	public void setGrid(ApkModel apkmodel, Grid<Tracker> grid) {
+		List<Tracker> mylist=apkTrackerAssociationRepository.findAllTrackersByApkModel(apkmodel); //new ArrayList<Tracker>();
+		
+		/*
+		for (int i = 0; i < libModels.length; i++) {
+			//System.out.println(libModels[i].getLibrary());
 			
 			Tracker t=exists(libModels[i].getLibrary());
 			if (t!=null) {
 				mylist.add(t);
 			}
 			
-		}
+		}*/
 		
 		grid.removeAllColumns();
 		grid.setSelectionMode(Grid.SelectionMode.NONE);
-		grid.addColumn(Tracker::getTrackersPropertiesName).setCaption("Name");
-		grid.addColumn(Tracker::getTrackersPropertiesWebsite).setCaption("Website");
+		grid.addColumn(Tracker::getName).setCaption("Name");
+		grid.addColumn(Tracker::getWebsite).setCaption("Website");
 		grid.setItems(mylist);
 		grid.setWidth("100%");
 
@@ -96,25 +117,6 @@ public class TrackerService implements Serializable {
 	}
 	
 	
-	public void setGrid(List<PermissionMethodCallModel> list, Grid<PermissionMethodCallModel> grid) {
-
-		
-		grid.removeAllColumns();
-		grid.setSelectionMode(Grid.SelectionMode.NONE);
-		grid.addColumn(PermissionMethodCallModel::getPermissionName).setCaption("Permission Name");
-		grid.addColumn(PermissionMethodCallModel::getCallerFunction).setCaption("Caller Function (package -> function)");
-		grid.addColumn(PermissionMethodCallModel::getPermissionFunction).setCaption("Permission Function (package -> function)");
-		grid.setItems(list);
-		grid.setWidth("100%");
-
-		if (list.size() == 0) {
-			grid.setHeightByRows(1);
-		} else if (list.size() >= 10) {
-			grid.setHeightByRows(10);
-		} else {
-			grid.setHeightByRows(list.size());
-		}
-		grid.setVisible(true);
-	}
+	
 
 }

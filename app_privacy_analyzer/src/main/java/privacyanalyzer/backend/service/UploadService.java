@@ -20,10 +20,11 @@ import com.vaadin.ui.Upload.SucceededListener;
 
 import privacyanalyzer.backend.data.ApplicationPermissionsModel;
 import privacyanalyzer.backend.data.LibraryModel;
-import privacyanalyzer.backend.data.PermissionMethodCallModel;
 import privacyanalyzer.backend.data.entity.ApkModel;
+import privacyanalyzer.backend.data.entity.PermissionMethodCallModel;
 import privacyanalyzer.functionalities.APKAnalyzer;
 import privacyanalyzer.functionalities.MalwarePrediction;
+import privacyanalyzer.ui.util.Hash;
 import privacyanalyzer.ui.util.Paths;
 import privacyanalyzer.ui.view.analyze.AnalyzeView;
 import weka.classifiers.Classifier;
@@ -34,17 +35,22 @@ public class UploadService implements Receiver, SucceededListener {
 	private final ApkService apkService;
 	private final PermissionService permissionService;
 	private final AnalyzeService analyzeService;
-	
+	private final TrackerService trackerService;
+	private final PermissionCallsService permissionCallsService;
+
 	public File file;
 
 	private File directory;
 	private AnalyzeView aView;
 
 	@Autowired
-	public UploadService(ApkService apkService,PermissionService permissionService,AnalyzeService analyzeService) {
+	public UploadService(ApkService apkService, PermissionService permissionService, AnalyzeService analyzeService,
+			TrackerService trackerService, PermissionCallsService permissionCallsService) {
 		this.apkService = apkService;
-		this.permissionService=permissionService;
-		this.analyzeService=analyzeService;
+		this.permissionService = permissionService;
+		this.analyzeService = analyzeService;
+		this.trackerService = trackerService;
+		this.permissionCallsService = permissionCallsService;
 	}
 
 	public void setView(AnalyzeView v) {
@@ -81,22 +87,28 @@ public class UploadService implements Receiver, SucceededListener {
 	public void uploadSucceeded(SucceededEvent event) {
 		// Show the uploaded file in the image viewer
 		System.out.println("Analyzing " + file.getAbsolutePath());
-		//APKAnalyzer apkanalyzer = new APKAnalyzer();
+		// APKAnalyzer apkanalyzer = new APKAnalyzer();
+		String sha256;
 		ApkModel apkmodel;
 		ApkModel loaded;
 		boolean apkexists;
 		try {
-			apkmodel = analyzeService.getApkInformation(file.getAbsolutePath());
-			loaded = apkService.getRepository().findBySha256(apkmodel.getSha256());
-			if (loaded ==null) apkexists=false;
-			else {
-				apkexists=true;
-				apkmodel=loaded;}
-			
+			sha256 = Hash.SHA256.getHash(file);
+
+			loaded = apkService.getRepository().findBySha256(sha256);
+			if (loaded == null) {
+
+				apkexists = false;
+				apkmodel = analyzeService.getApkInformation(file.getAbsolutePath());
+			} else {
+				apkexists = true;
+				apkmodel = loaded;
+			}
+
 			if (apkexists) {
 				System.out.println("APK already exists");
-				
-				//loaded=apkService.getRepository().checkIfExists(apkmodel).get(0);
+
+				// loaded=apkService.getRepository().checkIfExists(apkmodel).get(0);
 			} else {
 				apkService.save(apkmodel);
 				System.out.println("Adding APK information to DB");
@@ -104,83 +116,89 @@ public class UploadService implements Receiver, SucceededListener {
 			// System.out.println(apkmodel.toString());
 			aView.getProgressBar().setVisible(false);
 			aView.setInfo(apkmodel);
-			ApplicationPermissionsModel apm = analyzeService.getAPKPermissions(file.getAbsolutePath());
-			
 
+			ApplicationPermissionsModel apm = null;
 			if (!apkexists) {
-			permissionService.saveApkPermissions(apm.getDeclared(), apkmodel, "Declared");
-			permissionService.saveApkPermissions(apm.getNotRequiredButUsed(), apkmodel, "NotRequiredButUsed");
-			permissionService.saveApkPermissions(apm.getRequiredAndUsed(), apkmodel, "RequiredAndUsed");
-			permissionService.saveApkPermissions(apm.getRequiredButNotUsed(), apkmodel, "RequiredButNotUsed");
-			
-			
-			
-			permissionService.setGrid(apm.getDeclared(), aView.getDeclaredPermissionsGrid());
-			permissionService.setGrid(apm.getNotRequiredButUsed(), aView.getNotDeclaredButUsedPermissionsGrid());
-			permissionService.setGrid(apm.getRequiredAndUsed(), aView.getDeclaredAndUsedPermissionsGrid());
-			permissionService.setGrid(apm.getRequiredButNotUsed(), aView.getDeclaredAndNotUsedPermissionsGrid());
-			}else {
-				System.out.println(permissionService.getApkPermissionAssociationRepository().findAllPermissionsByApkModelAndPermissionType(apkmodel, "Declared"));
-			permissionService
-			.setGridbyPermissions
-			(permissionService.
-					getApkPermissionAssociationRepository().
-					findAllPermissionsByApkModelAndPermissionType(apkmodel, "Declared"), aView.getDeclaredPermissionsGrid());
-			
-			
-			permissionService
-			.setGridbyPermissions
-			(permissionService.
-					getApkPermissionAssociationRepository().
-					findAllPermissionsByApkModelAndPermissionType(apkmodel, "NotRequiredButUsed"), aView.getNotDeclaredButUsedPermissionsGrid());
-			
-			permissionService
-			.setGridbyPermissions
-			(permissionService.
-					getApkPermissionAssociationRepository().
-					findAllPermissionsByApkModelAndPermissionType(apkmodel, "RequiredAndUsed"), aView.getDeclaredAndUsedPermissionsGrid());
-			
-			permissionService
-			.setGridbyPermissions
-			(permissionService.
-					getApkPermissionAssociationRepository().
-					findAllPermissionsByApkModelAndPermissionType(apkmodel, "RequiredButNotUsed"), aView.getDeclaredAndNotUsedPermissionsGrid());
-			
-			}
-			
-			
-			System.out.println(analyzeService.predict(apm.getDeclared()));
-			Classifier cls = (Classifier) weka.core.SerializationHelper.read(Paths.wekaModelPath);
-			MalwarePrediction malpred = new MalwarePrediction(cls, apm.getDeclared());
-			if (malpred.predict() == 1) {
-				apkmodel.setMalware(true);
-				if (!apkexists) apkService.save(apkmodel);
-				aView.getMalwareLabel().setValue("APK might be a MALWARE");
+				apm = analyzeService.getAPKPermissions(file.getAbsolutePath());
+				permissionService.saveApkPermissions(apm.getDeclared(), apkmodel, "Declared");
+				permissionService.saveApkPermissions(apm.getNotRequiredButUsed(), apkmodel, "NotRequiredButUsed");
+				permissionService.saveApkPermissions(apm.getRequiredAndUsed(), apkmodel, "RequiredAndUsed");
+				permissionService.saveApkPermissions(apm.getRequiredButNotUsed(), apkmodel, "RequiredButNotUsed");
 
+			} 
+				//System.out.println(permissionService.getApkPermissionAssociationRepository().findAllPermissionsByApkModelAndPermissionType(apkmodel, "Declared"));
+				permissionService.setGridbyPermissions(
+						permissionService.getApkPermissionAssociationRepository()
+								.findAllPermissionsByApkModelAndPermissionType(apkmodel, "Declared"),
+						aView.getDeclaredPermissionsGrid());
+
+				permissionService.setGridbyPermissions(
+						permissionService.getApkPermissionAssociationRepository()
+								.findAllPermissionsByApkModelAndPermissionType(apkmodel, "NotRequiredButUsed"),
+						aView.getNotDeclaredButUsedPermissionsGrid());
+
+				permissionService.setGridbyPermissions(
+						permissionService.getApkPermissionAssociationRepository()
+								.findAllPermissionsByApkModelAndPermissionType(apkmodel, "RequiredAndUsed"),
+						aView.getDeclaredAndUsedPermissionsGrid());
+
+				permissionService.setGridbyPermissions(
+						permissionService.getApkPermissionAssociationRepository()
+								.findAllPermissionsByApkModelAndPermissionType(apkmodel, "RequiredButNotUsed"),
+						aView.getDeclaredAndNotUsedPermissionsGrid());
+
+			
+
+			// System.out.println(analyzeService.predict(apm.getDeclared()));
+			if (!apkexists) {
+				Classifier cls = (Classifier) weka.core.SerializationHelper.read(Paths.wekaModelPath);
+				MalwarePrediction malpred = new MalwarePrediction(cls, apm.getDeclared());
+				if (malpred.predict() == 1) {
+					apkmodel.setMalware(true);
+
+					apkService.save(apkmodel);
+
+				} else {
+					apkmodel.setMalware(false);
+
+					apkService.save(apkmodel);
+
+				}
+			}
+
+			if (apkmodel.isMalware()) {
+				aView.getMalwareLabel().setValue("APK might be a MALWARE");
 			} else {
-				apkmodel.setMalware(false);
-				if (!apkexists) apkService.save(apkmodel);
 				aView.getMalwareLabel().setValue("No malicous activity detected");
 			}
+
 			aView.getMalwareLabel().setVisible(true);
 
-			
-			
 			// System.out.println(apm.getDeclared().toString());
-			LibraryModel[] libModels = analyzeService.getLibrariesPermissions(file.getAbsolutePath());
-			//for (int i = 0; i < libModels.length; i++) {
-				//System.out.println(libModels[i].getLibrary());
-			//}
-			
-			aView.trackerService.setGrid(libModels, aView.getTrackersGrid());
-			ArrayList<String> usedpermissionsList= new ArrayList<String>();
+
+			// for (int i = 0; i < libModels.length; i++) {
+			// System.out.println(libModels[i].getLibrary());
+			// }
+			if (!apkexists) {
+				LibraryModel[] libModels = analyzeService.getLibrariesPermissions(file.getAbsolutePath());
+				trackerService.saveTrackers(libModels, apkmodel);
+			}
+
+			trackerService.setGrid(apkmodel, aView.getTrackersGrid());
+
+			if (!apkexists) {
+			ArrayList<String> usedpermissionsList = new ArrayList<String>();
 			usedpermissionsList.addAll(apm.getRequiredAndUsed());
 			usedpermissionsList.addAll(apm.getNotRequiredButUsed());
-			ArrayList<PermissionMethodCallModel> calllist=analyzeService.getCalls(file.getAbsolutePath(), usedpermissionsList);
+
 			
-			aView.trackerService.setGrid(calllist, aView.getCallsGrid());
-			
-			
+				ArrayList<PermissionMethodCallModel> calllist = analyzeService.getCalls(file.getAbsolutePath(),
+						usedpermissionsList);
+				permissionCallsService.saveAll(calllist, apkmodel);
+			}
+
+			permissionCallsService.setGrid(apkmodel, aView.getCallsGrid());
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -188,7 +206,5 @@ public class UploadService implements Receiver, SucceededListener {
 		file.delete();
 
 	}
-	
 
-	
 }

@@ -20,10 +20,10 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.vaadin.ui.Grid;
 
-import privacyanalyzer.backend.data.PermissionMethodCallModel;
 import privacyanalyzer.backend.data.entity.ApkModel;
 import privacyanalyzer.backend.data.entity.ApkPermissionAssociation;
 import privacyanalyzer.backend.data.entity.Permission;
+import privacyanalyzer.backend.data.entity.PermissionMethodCallModel;
 import privacyanalyzer.ui.util.Paths;
 import privacyanalyzer.backend.ApkPermissionAssociationRepository;
 import privacyanalyzer.backend.ApkRepository;
@@ -125,9 +125,9 @@ public class PermissionService implements Serializable{
 			Permission p=permissionRepository.findByPermissionValue(pName);
 			if (p==null) {
 				p=new Permission(pName);
-				System.out.println(pName);
+				//System.out.println(pName);
 				permissionRepository.save(p);
-				System.out.println("Saved");
+				//System.out.println("Saved");
 			}
 			
 			ApkPermissionAssociation assoc=new ApkPermissionAssociation(apk,p,type);

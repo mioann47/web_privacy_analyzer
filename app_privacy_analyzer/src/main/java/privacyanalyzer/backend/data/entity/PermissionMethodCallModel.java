@@ -1,17 +1,41 @@
-package privacyanalyzer.backend.data;
+package privacyanalyzer.backend.data.entity;
 
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 
-public class PermissionMethodCallModel implements Serializable{
+@Table(name="permissionCalls")
+@Entity
+public class PermissionMethodCallModel extends MyAbstractEntity{
+	
+	
 	private String permissionName;
+	
 	private String callerFunction;
+	
 	private String permissionFunction;
 
+	@ManyToOne
+	@NotNull
+	private ApkModel apk;
 	
 	
+	public ApkModel getApk() {
+		return apk;
+	}
+
+
+
+	public void setApk(ApkModel apk) {
+		this.apk = apk;
+	}
+
+
+
 	/**
 	 * 
 	 */

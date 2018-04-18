@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 
 import privacyanalyzer.backend.data.ApplicationPermissionsModel;
 import privacyanalyzer.backend.data.LibraryModel;
-import privacyanalyzer.backend.data.PermissionMethodCallModel;
 import privacyanalyzer.backend.data.entity.ApkModel;
+import privacyanalyzer.backend.data.entity.PermissionMethodCallModel;
 import privacyanalyzer.functionalities.APKAnalyzer;
 import privacyanalyzer.functionalities.MalwarePrediction;
 import privacyanalyzer.ui.util.Paths;

@@ -7,17 +7,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity(name="trackers")
-public class Tracker implements Serializable{
+public class Tracker extends MyAbstractEntity{
 
-	@Id
-	@GeneratedValue
-	private Long trackersPropertiesId;
+
 	
-	private String trackersPropertiesWebsite;
+	private String website;
 	
-	private String trackersPropertiesName;
+	private String name;
 	
-	private String trackersPropertiesCodeSignature;
+	private String codeSignature;
 
 	/**
 	 * 
@@ -32,46 +30,41 @@ public class Tracker implements Serializable{
 	 * @param trackersPropertiesName
 	 * @param trackersPropertiesCodeSignature
 	 */
-	public Tracker(Long trackersPropertiesId, String trackersPropertiesWebsite, String trackersPropertiesName,
+	public Tracker(String trackersPropertiesWebsite, String trackersPropertiesName,
 			String trackersPropertiesCodeSignature) {
 		super();
-		this.trackersPropertiesId = trackersPropertiesId;
-		this.trackersPropertiesWebsite = trackersPropertiesWebsite;
-		this.trackersPropertiesName = trackersPropertiesName;
-		this.trackersPropertiesCodeSignature = trackersPropertiesCodeSignature;
+		
+		this.website = trackersPropertiesWebsite;
+		this.name = trackersPropertiesName;
+		this.codeSignature = trackersPropertiesCodeSignature;
 	}
 
-	public Long getTrackersPropertiesId() {
-		return trackersPropertiesId;
+	public String getWebsite() {
+		return website;
 	}
 
-	public void setTrackersPropertiesId(Long trackersPropertiesId) {
-		this.trackersPropertiesId = trackersPropertiesId;
+	public void setWebsite(String website) {
+		this.website = website;
 	}
 
-	public String getTrackersPropertiesWebsite() {
-		return trackersPropertiesWebsite;
+	public String getName() {
+		return name;
 	}
 
-	public void setTrackersPropertiesWebsite(String trackersPropertiesWebsite) {
-		this.trackersPropertiesWebsite = trackersPropertiesWebsite;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getTrackersPropertiesName() {
-		return trackersPropertiesName;
+	public String getCodeSignature() {
+		return codeSignature;
 	}
 
-	public void setTrackersPropertiesName(String trackersPropertiesName) {
-		this.trackersPropertiesName = trackersPropertiesName;
+	public void setCodeSignature(String codeSignature) {
+		this.codeSignature = codeSignature;
 	}
 
-	public String getTrackersPropertiesCodeSignature() {
-		return trackersPropertiesCodeSignature;
-	}
 
-	public void setTrackersPropertiesCodeSignature(String trackersPropertiesCodeSignature) {
-		this.trackersPropertiesCodeSignature = trackersPropertiesCodeSignature;
-	}
+	
 	
 	
 	
