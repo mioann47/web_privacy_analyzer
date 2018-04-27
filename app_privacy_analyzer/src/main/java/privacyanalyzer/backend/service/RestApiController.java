@@ -75,7 +75,7 @@ public class RestApiController {
 
     	
     	
-    	User user= new User(email,name,password1, Role.ADMIN);
+    	User user= new User(email,name,password1, Role.USER);
         logger.info("Creating User : {}", user);
  
         if (userService.isUserExist(user)) {

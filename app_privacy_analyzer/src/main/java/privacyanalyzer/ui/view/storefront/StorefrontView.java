@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.View;
@@ -12,6 +13,8 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.annotation.ViewScope;
+
+import privacyanalyzer.backend.data.Role;
 import privacyanalyzer.backend.data.entity.Order;
 import privacyanalyzer.ui.navigation.NavigationManager;
 import privacyanalyzer.ui.view.orderedit.OrderEditView;
@@ -25,6 +28,7 @@ import com.vaadin.ui.Button.ClickShortcut;
  * is added to the class, you should consider splitting out a presenter.
  */
 @SpringView
+@Secured(Role.ADMIN)
 public class StorefrontView extends StorefrontViewDesign implements View {
 
 	private static final String PARAMETER_SEARCH = "search";

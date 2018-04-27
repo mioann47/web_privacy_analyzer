@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
 import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 
 import privacyanalyzer.backend.data.Role;
 import privacyanalyzer.ui.MainView;
@@ -19,6 +20,12 @@ private final NavigationManager navigationManager;
 	public LoginRegisterView(NavigationManager navigationManager) {
 		this.navigationManager = navigationManager;
 		
+	}
+	
+	@Override
+	public void enter(ViewChangeEvent event) {
+		navigationManager.navigateToDefaultViewForce();
+		MainView.outnow();
 	}
 	
 	@PostConstruct

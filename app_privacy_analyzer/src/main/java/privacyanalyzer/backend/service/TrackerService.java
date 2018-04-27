@@ -104,7 +104,7 @@ public class TrackerService implements Serializable {
 		grid.addColumn(Tracker::getName).setCaption("Name");
 		grid.addColumn(Tracker::getWebsite).setCaption("Website");
 		grid.setItems(mylist);
-		grid.setWidth("100%");
+		//grid.setWidth("100%");
 
 		if (mylist.size() == 0) {
 			grid.setHeightByRows(1);

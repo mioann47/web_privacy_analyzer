@@ -18,7 +18,13 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.vaadin.data.HasValue.ValueChangeEvent;
+import com.vaadin.data.HasValue.ValueChangeListener;
+import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.Grid.Column;
+import com.vaadin.ui.components.grid.HeaderRow;
 
 import privacyanalyzer.backend.data.entity.ApkModel;
 import privacyanalyzer.backend.data.entity.ApkPermissionAssociation;
@@ -100,14 +106,34 @@ public class PermissionService implements Serializable{
 		
 		grid.removeAllColumns();
 		grid.setSelectionMode(Grid.SelectionMode.NONE);
-		grid.addColumn(Permission::getPermissionName).setCaption("Permission Name")
+		Column<Permission, String> permNameColumn =grid.addColumn(Permission::getPermissionName).setCaption("Permission Name")
 				.setDescriptionGenerator(Permission::getPermissionDesc);
-		grid.addColumn(Permission::getPermissionValue).setCaption("Permission Value")
+		Column<Permission, String> permValueColumn = grid.addColumn(Permission::getPermissionValue).setCaption("Permission Value")
 				.setDescriptionGenerator(Permission::getPermissionDesc);
-		grid.addColumn(Permission::getProtectionlvlName).setCaption("Protection Level")
+		Column<Permission, String> permProtectionLvlNameColumn =grid.addColumn(Permission::getProtectionlvlName).setCaption("Protection Level")
 				.setDescriptionGenerator(Permission::getProtectionlvlDesc);
 		grid.setItems(permissionlist);
-		grid.setWidth("100%");
+		//grid.setWidth("100%");
+		
+		TextField permNameFilter=new TextField();
+		permNameFilter.setSizeFull();
+		permNameFilter.setHeight("80%");
+		permNameFilter.setPlaceholder("Search by name...");
+		permNameFilter.addValueChangeListener(new ValueChangeListener<String>() {
+			
+			@Override
+			public void valueChange(ValueChangeEvent<String> event) {
+		        ListDataProvider<Permission> dataProvider = (ListDataProvider<Permission>) grid.getDataProvider();
+		        dataProvider.setFilter(Permission::getPermissionName, s -> caseInsensitiveContains(s, event.getValue()));
+				
+			}
+			
+		    private Boolean caseInsensitiveContains(String where, String what) {
+		        return where.toLowerCase().contains(what.toLowerCase());
+		    }
+		});
+        HeaderRow filterRow = grid.appendHeaderRow();
+       	filterRow.getCell(permNameColumn).setComponent(permNameFilter);
 		
 		if (permissionlist.size() == 0) {
 			grid.setHeightByRows(1);

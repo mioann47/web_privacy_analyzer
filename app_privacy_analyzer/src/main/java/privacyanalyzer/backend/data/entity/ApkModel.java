@@ -1,6 +1,8 @@
 package privacyanalyzer.backend.data.entity;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -138,5 +140,18 @@ public class ApkModel extends MyAbstractEntity{
 		this.isMalware = isMalware;
 	}
 	
+	public String getDateString() {
+		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        String date = formatter.format(this.createdAt);
+       
+		return date;
+	}
+	
+	public String getTimeString() {
+		DateFormat formatter = new SimpleDateFormat("HH:mm");
+		 String time = formatter.format(this.createdAt);
+	       
+			return time;
+	}
 
 }

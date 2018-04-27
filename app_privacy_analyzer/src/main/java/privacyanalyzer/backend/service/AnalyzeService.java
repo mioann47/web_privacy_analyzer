@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -24,13 +26,15 @@ public class AnalyzeService extends APKAnalyzer implements Serializable{
 
 	private final ApkService apkService;
 	private final PermissionService permissionService;
-
+	private final TrackerService trackerService;
+	private final PermissionCallsService permissionCallsService;
 
 	@Autowired
-	public AnalyzeService(ApkService apkService,PermissionService permissionService) {
+	public AnalyzeService(ApkService apkService,PermissionService permissionService,TrackerService trackerService,PermissionCallsService permissionCallsService) {
 		this.apkService = apkService;
 		this.permissionService=permissionService;
-		
+		this.trackerService = trackerService;
+		this.permissionCallsService = permissionCallsService;
 	}
 
 	public boolean predict(ArrayList<String> permissionList) {
@@ -51,7 +55,7 @@ public class AnalyzeService extends APKAnalyzer implements Serializable{
 		
 		try {
 			ApkModel  apkmodel= getApkInformation(file.getAbsolutePath());
-			
+			apkService.save(apkmodel);
 			
 			ApplicationPermissionsModel apm = getAPKPermissions(file.getAbsolutePath());
 			permissionService.saveApkPermissions(apm.getDeclared(), apkmodel, "Declared");
@@ -59,17 +63,37 @@ public class AnalyzeService extends APKAnalyzer implements Serializable{
 			permissionService.saveApkPermissions(apm.getRequiredAndUsed(), apkmodel, "RequiredAndUsed");
 			permissionService.saveApkPermissions(apm.getRequiredButNotUsed(), apkmodel, "RequiredButNotUsed");
 			
-			apkmodel.setMalware(predict(apm.getDeclared()));
+			Set<String> hsmalware = new HashSet<>();
+			hsmalware.addAll(apm.getDeclared());
+			hsmalware.addAll(apm.getNotRequiredButUsed());
+			ArrayList<String> malwarePermissionToCheck=new ArrayList<String>();
+			malwarePermissionToCheck.addAll(hsmalware);
+			apkmodel.setMalware(predict(malwarePermissionToCheck));
 			apkService.save(apkmodel);
 			
 			LibraryModel[] libModels = getLibrariesPermissions(file.getAbsolutePath());
 			
-			//find trackers save
+		    ArrayList<String> libsPermissions = new ArrayList<String>();
+		    
+		    for (int i=0;i<libModels.length;i++) {
+		    	libsPermissions.addAll(libModels[i].getPermission());
+		    }
+
+		    Set<String> hs = new HashSet<>();
+		    hs.addAll(libsPermissions);
+		    libsPermissions.clear();
+		    libsPermissions.addAll(hs);
+		    permissionService.saveApkPermissions(libsPermissions, apkmodel, "LibraryPermission");
+			trackerService.saveTrackers(libModels, apkmodel);
 			
-			ArrayList<String> usedpermissionsList= new ArrayList<String>();
+			ArrayList<String> usedpermissionsList = new ArrayList<String>();
 			usedpermissionsList.addAll(apm.getRequiredAndUsed());
 			usedpermissionsList.addAll(apm.getNotRequiredButUsed());
-			ArrayList<PermissionMethodCallModel> calllist=getCalls(file.getAbsolutePath(), usedpermissionsList);
+
+			
+				ArrayList<PermissionMethodCallModel> calllist = getCalls(file.getAbsolutePath(),
+						usedpermissionsList);
+				permissionCallsService.saveAll(calllist, apkmodel);
 			
 			//save calls
 			

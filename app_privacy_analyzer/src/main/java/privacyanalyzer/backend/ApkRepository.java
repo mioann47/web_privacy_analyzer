@@ -20,4 +20,5 @@ public interface ApkRepository extends JpaRepository<ApkModel, Long> {
 	
 	ApkModel findBySha256(String sha256);
 	
+	ApkModel findById(Long id);
 }

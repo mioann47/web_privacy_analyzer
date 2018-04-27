@@ -1,5 +1,6 @@
 package privacyanalyzer.backend.service;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import privacyanalyzer.backend.data.entity.ApkModel;
 import privacyanalyzer.backend.data.entity.User;
 
 @Service
-public class ApkService extends MyCrudService<ApkModel> {
+public class ApkService extends MyCrudService<ApkModel> implements Serializable{
 
 	private final ApkRepository apkRepository;
 	private final UserService userService;
@@ -40,12 +41,14 @@ public class ApkService extends MyCrudService<ApkModel> {
 		if (!current.getRole().equals(Role.GUEST)) {
 		apk.setUser(current);
 		}
+		if (apk.getAppName()==null || apk.getAppName().equals(""))
+			apk.setAppName(apk.getPackageName());
 		return getRepository().save(apk);
 	}
 	
 
 	@Override
-	protected ApkRepository getRepository() {
+	public ApkRepository getRepository() {
 		// TODO Auto-generated method stub
 		return this.apkRepository;
 	}

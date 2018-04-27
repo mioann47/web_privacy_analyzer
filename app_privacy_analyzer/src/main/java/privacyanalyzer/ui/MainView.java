@@ -23,6 +23,7 @@ import privacyanalyzer.ui.view.about.AboutView;
 import privacyanalyzer.ui.view.admin.product.ProductAdminView;
 import privacyanalyzer.ui.view.admin.user.UserAdminView;
 import privacyanalyzer.ui.view.analyze.AnalyzeView;
+import privacyanalyzer.ui.view.apklist.ApkListView;
 import privacyanalyzer.ui.view.dashboard.DashboardView;
 import privacyanalyzer.ui.view.loginRegister.LoginRegisterView;
 import privacyanalyzer.ui.view.logout.LogoutView;
@@ -59,6 +60,7 @@ public class MainView extends MainViewDesign implements ViewDisplay {
 	public void init() {
 		thisview=this;
 		attachNavigation(analyze, AnalyzeView.class);
+		attachNavigation(apkList, ApkListView.class);
 		attachNavigation(storefront, StorefrontView.class);
 		attachNavigation(dashboard, DashboardView.class);
 		attachNavigation(users, UserAdminView.class);

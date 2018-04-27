@@ -67,7 +67,7 @@ public class PermissionCallsService extends MyCrudService<PermissionMethodCallMo
 		grid.addColumn(PermissionMethodCallModel::getPermissionFunction)
 				.setCaption("Permission Function (package -> function)");
 		grid.setItems(list);
-		grid.setWidth("100%");
+		//grid.setWidth("100%");
 
 		if (list.size() == 0) {
 			grid.setHeightByRows(1);

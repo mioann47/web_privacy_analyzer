@@ -21,6 +21,18 @@ public class MyAbstractEntity implements Serializable {
 	  public Date createdAt;
 	  
 	  
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public boolean isNew() {
 		return id == null;
 	}

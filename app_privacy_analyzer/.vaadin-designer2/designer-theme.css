@@ -12804,7 +12804,15 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .apptheme .v-grid.orders-grid .v-grid-cell {
-	height: 100px;
+	height: 120px;
+}
+
+.apptheme .v-grid.orders-grid .imageColumn .gwt-Image {
+	margin-top: 20px;
+	width: 80px;
+	height: 80px;
+	-webkit-align-self: center;
+	align-self: center;
 }
 
 .apptheme .v-grid.orders-grid .summary, .apptheme .v-grid.orders-grid .due {
@@ -12821,15 +12829,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .apptheme .v-grid.orders-grid .due .header {
-	font-size: 10px;
+	font-size: 13px;
 	font-weight: 400;
 	padding: 2px 7px;
 	border-radius: 15px;
 	border: 1px solid transparent;
-	margin: 5px 0;
+	margin: 15px 0;
 }
 
-.apptheme .v-grid.orders-grid .today.ready .due .header, .apptheme .v-grid.orders-grid .today.delivered .due .header {
+.apptheme .v-grid.orders-grid .due .content {
+	font-size: 11px;
+}
+
+.apptheme .v-grid.orders-grid .today.delivered .due .header {
 	background-color: #4b4b65;
 	color: #fff;
 	opacity: 0.7;
