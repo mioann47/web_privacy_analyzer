@@ -34,10 +34,10 @@ public class ApkService extends MyCrudService<ApkModel> implements Serializable{
 
 
 	
-	@Override
+//@Override
 	@Transactional
-	public ApkModel save(ApkModel apk) {
-		User current=SecurityUtils.getCurrentUser(userService);
+	public ApkModel save(ApkModel apk,	User current) {
+		//User current=SecurityUtils.getCurrentUser(userService);
 		if (!current.getRole().equals(Role.GUEST)) {
 		apk.setUser(current);
 		}

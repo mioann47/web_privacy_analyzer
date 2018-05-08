@@ -50,8 +50,11 @@ public class ApkModel extends MyAbstractEntity{
 	@NotNull
 	private boolean isMalware;
 	
+	@NotNull
+	private boolean isAnalyzed;
 
-
+	private float score;
+	
 
 	@ManyToOne
 	private User user;
@@ -152,6 +155,26 @@ public class ApkModel extends MyAbstractEntity{
 		 String time = formatter.format(this.createdAt);
 	       
 			return time;
+	}
+
+
+	public boolean isAnalyzed() {
+		return isAnalyzed;
+	}
+
+
+	public void setAnalyzed(boolean isAnalyzed) {
+		this.isAnalyzed = isAnalyzed;
+	}
+
+
+	public float getScore() {
+		return score;
+	}
+
+
+	public void setScore(float score) {
+		this.score = score;
 	}
 
 }

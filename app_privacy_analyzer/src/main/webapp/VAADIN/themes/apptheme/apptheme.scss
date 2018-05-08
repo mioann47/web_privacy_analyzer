@@ -34,6 +34,8 @@ $v-focus-color: #4b4b65;
 $app-background-gradient: unquote("linear-gradient(145deg, #484962 30%, #d06b41 100%)");
 $app-background-image: url('bg.jpg');
 
+
+
 @import '../valo/valo.scss';
 @import 'ordersgrid';
 @import 'ordersview';
@@ -42,10 +44,25 @@ $app-background-image: url('bg.jpg');
 
 @mixin apptheme {
   @include valo;
+  
   @include ordersgrid;
   @include ordersview;
   @include dashboardview;
   @include menu;
+
+	$v-selection-color: #2c9020;
+  @include valo-progressbar(greenpbar);
+
+			$v-selection-color: #F9F916;
+  @include valo-progressbar(yellowpbar);
+
+			$v-selection-color: #F9D616;
+  @include valo-progressbar(orangepbar);
+	
+		$v-selection-color: #EE1010;
+  @include valo-progressbar(redpbar);
+	
+
 
   .v-errorindicator {
     // Only show validation errors using field styles

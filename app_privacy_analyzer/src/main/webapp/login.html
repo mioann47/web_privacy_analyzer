@@ -61,6 +61,19 @@ Vaadin-Refresh: context://login.html
 		}
 		
 	}
+	
+	
+	function validateForm() {
+	    var x = document.forms["signInForm"]["username"].value;
+	   // if (x == "") {
+		    var re = /\S+@\S+\.\S+/;
+    	 var g = re.test(String(x).toLowerCase());
+	        
+    	 if (g==false) alert("Please enter a valid email address")
+	       return g;
+	    //}
+	}
+	
 </script>
 <style>
 @font-face {
@@ -387,7 +400,7 @@ button {
 	</div>
 	<div id="form">
 
-		<form  method="post" action="login" id="theform" class='theformx'>
+		<form  method="post" action="login" id="theform" class='theformx' name="signInForm" onsubmit="return validateForm()">
 			<h2>Sign in</h2>
 			<label id="login-label" for="login">Email</label> <input type="text"
 				id="login" name="username" aria-labelledby="login-label" autofocus class='inputx'>

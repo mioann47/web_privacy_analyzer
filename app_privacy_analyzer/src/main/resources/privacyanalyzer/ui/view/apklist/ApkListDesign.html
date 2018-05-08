@@ -12,6 +12,10 @@
     <vaadin-horizontal-layout spacing="false" width-full margin-left margin-right margin-top>
      <vaadin-css-layout style-name="list-filters" width-full :expand>
       <vaadin-text-field id="searchField" placeholder="Search" width="300px" _id="searchField"></vaadin-text-field>
+      <vaadin-radio-button-group description="Search by app name or by sha256 hash" data-item-type="java.lang.String" _id="searchOptions">
+       <option item="name" selected>Search by Name</option>
+       <option item="sha">Search by SHA256</option>
+      </vaadin-radio-button-group>
       <vaadin-button icon="fonticon://Vaadin-Icons/e805" id="searchButton" plain-text _id="searchButton"></vaadin-button>
      </vaadin-css-layout>
      <vaadin-button icon="fonticon://Vaadin-Icons/e801" style-name="friendly" plain-text _id="analyzeApk">

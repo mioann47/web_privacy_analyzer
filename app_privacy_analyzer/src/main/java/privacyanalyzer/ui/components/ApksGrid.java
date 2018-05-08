@@ -63,9 +63,21 @@ public class ApksGrid extends Grid<ApkModel> {
 	private ExternalResource getStatusImg(ApkModel apkmodel) {
 
 		ExternalResource resource;
-		resource = new ExternalResource((
-                "VAADIN/images/malware.png"));
-
+		
+		/*resource = new ExternalResource((
+                "VAADIN/images/malware.png"));*/
+		
+		if (!apkmodel.isAnalyzed()) {
+			resource = new ExternalResource(( "VAADIN/images/analyzing.png"));
+			
+		} else {
+			if (apkmodel.isMalware()) {
+				resource = new ExternalResource("VAADIN/images/malware.png");
+				
+			} else {
+				resource = new ExternalResource("VAADIN/images/clean.png");
+			}
+		}
 		return resource;
 	}
 

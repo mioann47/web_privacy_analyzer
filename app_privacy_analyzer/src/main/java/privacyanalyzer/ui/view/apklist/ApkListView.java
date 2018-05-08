@@ -18,11 +18,8 @@ import privacyanalyzer.ui.view.analyze.AnalyzeView;
 import privacyanalyzer.ui.view.apkdetails.ApkDetailsView;
 import privacyanalyzer.ui.view.orderedit.OrderEditView;
 
-
-
-
 @SpringView
-public class ApkListView extends ApkListDesign implements View{
+public class ApkListView extends ApkListDesign implements View {
 
 	private final NavigationManager navigationManager;
 	private final ApkRepository apkRepository;
@@ -34,37 +31,53 @@ public class ApkListView extends ApkListDesign implements View{
 		this.apkRepository = apkRepository;
 	}
 
-
-
 	@PostConstruct
 	public void init() {
-		
-		list.setItems(apkRepository.findAll());
-		list.addSelectionListener(e->selectedApk(e.getFirstSelectedItem().get()));
-		
-		this.searchField.addValueChangeListener(this::onNameFilterTextChange);
 
-		this.analyzeApk.addClickListener(e->goToAnalyzeView());
-		
-		ImageRenderer<ApkModel> renderer= (ImageRenderer<ApkModel>) list.getColumn("imageColumn").getRenderer();
-		renderer.addClickListener(e->selectedApk(e.getItem()));
+		list.setItems(apkRepository.findAll());
+		list.addSelectionListener(e -> selectedApk(e.getFirstSelectedItem().get()));
+
+		// this.searchField.addValueChangeListener(this::onNameFilterTextChange);
+		this.searchButton.addClickListener(e -> searchApk());
+		this.analyzeApk.addClickListener(e -> goToAnalyzeView());
+
+		ImageRenderer<ApkModel> renderer = (ImageRenderer<ApkModel>) list.getColumn("imageColumn").getRenderer();
+		renderer.addClickListener(e -> selectedApk(e.getItem()));
 	}
-	
+
 	private void goToAnalyzeView() {
 		this.navigationManager.navigateTo(AnalyzeView.class);
 	}
 
+	private void searchApk() {
 
+		String val = this.searchField.getValue();
+		String searchType = this.searchOptions.getValue();
+		if (searchType.equals("name")) {
+			ListDataProvider<ApkModel> dataProvider = (ListDataProvider<ApkModel>) list.getDataProvider();
+			dataProvider.setFilter(ApkModel::getAppName, s -> caseInsensitiveContains(s, val));
+		} else if (searchType.equals("sha")) {
+			ListDataProvider<ApkModel> dataProvider = (ListDataProvider<ApkModel>) list.getDataProvider();
+			dataProvider.setFilter(ApkModel::getSha256, s -> StringEquals(s, val));
+		}
+
+	}
 
 	public void selectedApk(ApkModel apkmodel) {
 		navigationManager.navigateTo(ApkDetailsView.class, apkmodel.getId());
 	}
-	
+
 	private void onNameFilterTextChange(HasValue.ValueChangeEvent<String> event) {
-		 ListDataProvider<ApkModel> dataProvider=(ListDataProvider<ApkModel>) list.getDataProvider();
-		 dataProvider.setFilter(ApkModel::getAppName, s -> caseInsensitiveContains(s, event.getValue()));
+		ListDataProvider<ApkModel> dataProvider = (ListDataProvider<ApkModel>) list.getDataProvider();
+		dataProvider.setFilter(ApkModel::getAppName, s -> caseInsensitiveContains(s, event.getValue()));
 	}
-    private Boolean caseInsensitiveContains(String where, String what) {
-        return where.toLowerCase().contains(what.toLowerCase());
-    }
+
+	private Boolean caseInsensitiveContains(String where, String what) {
+		return where.toLowerCase().contains(what.toLowerCase());
+	}
+	
+	private Boolean StringEquals(String s1, String s2) {
+		if (s2.equals("")|| s2==null) return true;
+		return s1.equalsIgnoreCase(s2);
+	}
 }

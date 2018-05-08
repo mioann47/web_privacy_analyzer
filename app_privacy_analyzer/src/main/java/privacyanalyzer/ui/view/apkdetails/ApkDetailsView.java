@@ -31,11 +31,9 @@ import privacyanalyzer.ui.navigation.NavigationManager;
 import privacyanalyzer.ui.view.analyze.AnalyzeView;
 import privacyanalyzer.ui.view.apklist.ApkListView;
 
-@SpringView(name="apk")
-public class ApkDetailsView extends ApkDetailsViewDesign implements View{
+@SpringView(name = "apk")
+public class ApkDetailsView extends ApkDetailsViewDesign implements View {
 
-	
-	
 	private final NavigationManager navigationManager;
 	private final ApkService apkService;
 	private final PermissionService permissionService;
@@ -54,13 +52,14 @@ public class ApkDetailsView extends ApkDetailsViewDesign implements View{
 		this.trackerService = trackerService;
 		this.permissionCallsService = permissionCallsService;
 	}
-	
+
 	@PostConstruct
 	public void init() {
-		this.backButton.addClickListener(e->goBack());
-		this.analyzeApk.addClickListener(e->goToAnalyzeView());
+		this.backButton.addClickListener(e -> goBack());
+		this.analyzeApk.addClickListener(e -> goToAnalyzeView());
+		this.scoreBar.setVisible(false);
 	}
-	
+
 	private void goBack() {
 		// TODO Auto-generated method stub
 		navigationManager.navigateTo(ApkListView.class);
@@ -69,7 +68,7 @@ public class ApkDetailsView extends ApkDetailsViewDesign implements View{
 	private void goToAnalyzeView() {
 		this.navigationManager.navigateTo(AnalyzeView.class);
 	}
-	
+
 	@Override
 	public void enter(ViewChangeEvent event) {
 		String apkId = event.getParameters();
@@ -77,12 +76,13 @@ public class ApkDetailsView extends ApkDetailsViewDesign implements View{
 			enterView(null);
 		} else {
 			try {
-			Long id=Long.parseLong(apkId);
-			if (Long.toString(id).equalsIgnoreCase(apkId)) {
-			enterView(id);}
-			else enterView(null);
-		
-			}catch(NumberFormatException e) {
+				Long id = Long.parseLong(apkId);
+				if (Long.toString(id).equalsIgnoreCase(apkId)) {
+					enterView(id);
+				} else
+					enterView(null);
+
+			} catch (NumberFormatException e) {
 				enterView(null);
 			}
 		}
@@ -90,98 +90,126 @@ public class ApkDetailsView extends ApkDetailsViewDesign implements View{
 
 	private void enterView(Long id) {
 		ApkModel apkmodel;
-		if (id==null) {
+		if (id == null) {
 			showNotFound();
 			return;
 		}
-		apkmodel=this.apkService.getRepository().findById(id);
-		if (apkmodel==null) {
+		apkmodel = this.apkService.getRepository().findById(id);
+		if (apkmodel == null) {
 			showNotFound();
 			return;
 		}
 		refreshView(apkmodel);
-		
-		
+
 	}
-	
+
 	private void refreshView(ApkModel apkmodel) {
 		this.appNameLabel.setValue(apkmodel.getAppName());
-		this.dateLabel.setValue(apkmodel.getDateString()+" "+apkmodel.getTimeString());
-		User u =apkmodel.getUser();
-		if (u==null) this.userLabel.setValue("Guest User");
-		else this.userLabel.setValue(u.getName());
-		this.packageName.setValue("Package Name: "+apkmodel.getPackageName());
-		this.packageVersionCode.setValue("Package Version Code: "+apkmodel.getPackageVersionCode());
-		this.packageVersionName.setValue("Package Version Name: "+apkmodel.getPackageVersionName());
-		this.minSDK.setValue("Min SDK: "+apkmodel.getMinSDK());
-		this.targetSDK.setValue("Target SDK: "+apkmodel.getTargetSDK());
+		this.dateLabel.setValue(apkmodel.getDateString() + " " + apkmodel.getTimeString());
+		User u = apkmodel.getUser();
+		if (u == null)
+			this.userLabel.setValue("Guest User");
+		else
+			this.userLabel.setValue(u.getName());
+		this.packageName.setValue("Package Name: " + apkmodel.getPackageName());
+		this.packageVersionCode.setValue("Package Version Code: " + apkmodel.getPackageVersionCode());
+		this.packageVersionName.setValue("Package Version Name: " + apkmodel.getPackageVersionName());
+		this.minSDK.setValue("Min SDK: " + apkmodel.getMinSDK());
+		this.targetSDK.setValue("Target SDK: " + apkmodel.getTargetSDK());
 		this.sha256.setValue(apkmodel.getSha256());
-		
+		if (apkmodel.getIsAdbBackupEnabled().equalsIgnoreCase("true")) {
+			this.adbCheckBox.setValue(true);
+		} else {
+			this.adbCheckBox.setValue(false);
+		}
+		if (apkmodel.getIsDebuggable().equalsIgnoreCase("true")) {
+			this.debugCheckBox.setValue(true);
+		} else {
+			this.debugCheckBox.setValue(false);
+		}
+
 		setStatus(apkmodel);
-		
-		permissionService.setGridbyPermissions(
-				permissionService.getApkPermissionAssociationRepository()
-						.findAllPermissionsByApkModelAndPermissionType(apkmodel, "Declared"),
-				this.declaredPermissionsGrid);
 
-		permissionService.setGridbyPermissions(
-				permissionService.getApkPermissionAssociationRepository()
-						.findAllPermissionsByApkModelAndPermissionType(apkmodel, "NotRequiredButUsed"),
-				this.notDeclaredButUsedPermissionsGrid);
+		permissionService.setGridbyPermissions(permissionService.getApkPermissionAssociationRepository()
+				.findAllPermissionsByApkModelAndPermissionType(apkmodel, "Declared"), this.declaredPermissionsGrid);
 
-		permissionService.setGridbyPermissions(
-				permissionService.getApkPermissionAssociationRepository()
-						.findAllPermissionsByApkModelAndPermissionType(apkmodel, "RequiredAndUsed"),
-				this.declaredAndUsedPermissionsGrid1);
+		permissionService
+				.setGridbyPermissions(
+						permissionService.getApkPermissionAssociationRepository()
+								.findAllPermissionsByApkModelAndPermissionType(apkmodel, "NotRequiredButUsed"),
+						this.notDeclaredButUsedPermissionsGrid);
 
-		permissionService.setGridbyPermissions(
-				permissionService.getApkPermissionAssociationRepository()
-						.findAllPermissionsByApkModelAndPermissionType(apkmodel, "RequiredButNotUsed"),
-				this.declaredAndNotUsedPermissionsGrid11);
-		
-		permissionService.setGridbyPermissions(
-				permissionService.getApkPermissionAssociationRepository()
-						.findAllPermissionsByApkModelAndPermissionType(apkmodel, "LibraryPermission"),
-				this.libraryPermissions);
-		
+		permissionService
+				.setGridbyPermissions(
+						permissionService.getApkPermissionAssociationRepository()
+								.findAllPermissionsByApkModelAndPermissionType(apkmodel, "RequiredAndUsed"),
+						this.declaredAndUsedPermissionsGrid1);
+
+		permissionService
+				.setGridbyPermissions(
+						permissionService.getApkPermissionAssociationRepository()
+								.findAllPermissionsByApkModelAndPermissionType(apkmodel, "RequiredButNotUsed"),
+						this.declaredAndNotUsedPermissionsGrid11);
+
+		permissionService.setGridbyPermissions(permissionService.getApkPermissionAssociationRepository()
+				.findAllPermissionsByApkModelAndPermissionType(apkmodel, "LibraryPermission"), this.libraryPermissions);
+
 		permissionCallsService.setGrid(apkmodel, this.callsGrid);
-		
+
 		trackerService.setGrid(apkmodel, this.trackersGrid);
-		
+
 	}
-	
+
 	private void showNotFound() {
 		removeAllComponents();
-		HorizontalLayout hl=new HorizontalLayout();
-		Label notFound=new Label("Apk not found");
+		HorizontalLayout hl = new HorizontalLayout();
+		Label notFound = new Label("Apk not found");
 		hl.setWidth("100%");
-		
+
 		hl.setDefaultComponentAlignment(Alignment.TOP_CENTER);
 		hl.addComponent(notFound);
 		addComponent(hl);
 	}
-	
+
 	private void setStatus(ApkModel apkmodel) {
-		boolean mal=apkmodel.isMalware();
-		String basepath = VaadinService.getCurrent()
-                .getBaseDirectory().getAbsolutePath();
+		boolean mal = apkmodel.isMalware();
+		String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
 		FileResource resource;
-		if (mal) {
-			resource = new FileResource(new File(basepath +
-	                "/VAADIN/images/malware.png"));
+		if (!apkmodel.isAnalyzed()) {
+			resource = new FileResource(new File(basepath + "/VAADIN/images/analyzing.png"));
+			statusLabel.setValue("Status: Analyzing APK...");
+		} else {
 			
-		}else {
-			resource = new FileResource(new File(basepath +
-	                "/VAADIN/images/clean.png"));
+			float score=apkmodel.getScore();
+			this.scoreBar.setCaptionAsHtml(true);
+			this.scoreBar.setCaption("<center>APK risk score: "+score+"/100</center>");
 			
+			if (score<25) {
+			this.scoreBar.setPrimaryStyleName("greenpbar");}
+			else if (score <40) {
+			this.scoreBar.setPrimaryStyleName("yellowpbar");}
+			else if (score <70) {
+			this.scoreBar.setPrimaryStyleName("orangepbar");}
+			else if(score <=100) {
+			this.scoreBar.setPrimaryStyleName("redpbar");}
+			
+			this.scoreBar.setValue(score/100);
+			this.scoreBar.setVisible(true);
+			
+			
+			if (mal) {
+				resource = new FileResource(new File(basepath + "/VAADIN/images/malware.png"));
+				statusLabel.setValue("Status: APK might be MALWARE!");
+
+			} else {
+				resource = new FileResource(new File(basepath + "/VAADIN/images/clean.png"));
+				statusLabel.setValue("Status: No malicious activity found!");
+			}
 		}
 		this.image.setSource(resource);
 		image.setWidth(100, Unit.PIXELS);
 		image.setHeight(100, Unit.PIXELS);
-	    image.setVisible(true);
+		image.setVisible(true);
 	}
-	
-	
-	
-	
+
 }

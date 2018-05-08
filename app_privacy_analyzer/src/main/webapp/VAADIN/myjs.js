@@ -125,7 +125,7 @@ $(function() {
                         
                     })
                     .fail(function(errMsg,code) {
-    alert("hi");
+    //alert("hi");
 
     });
   return false;

@@ -9,7 +9,9 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.util.FastByteArrayOutputStream;
 
+import com.vaadin.annotations.Push;
 import com.vaadin.data.Binder;
 import com.vaadin.navigator.View;
 import com.vaadin.server.Page;
@@ -19,27 +21,32 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
+import com.vaadin.ui.Upload.ProgressListener;
 import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 
+import privacyanalyzer.app.security.SecurityUtils;
 import privacyanalyzer.backend.data.Role;
 import privacyanalyzer.backend.data.entity.ApkModel;
 import privacyanalyzer.backend.data.entity.Permission;
 import privacyanalyzer.backend.data.entity.PermissionMethodCallModel;
 import privacyanalyzer.backend.data.entity.Tracker;
+import privacyanalyzer.backend.data.entity.User;
 import privacyanalyzer.backend.service.AnalyzeService;
 import privacyanalyzer.backend.service.ApkService;
 import privacyanalyzer.backend.service.PermissionService;
 import privacyanalyzer.backend.service.TrackerService;
-
+import privacyanalyzer.backend.service.UserService;
 import privacyanalyzer.ui.navigation.NavigationManager;
 import privacyanalyzer.ui.util.Hash;
 import privacyanalyzer.ui.util.Paths;
 import privacyanalyzer.ui.view.about.AboutView;
 import privacyanalyzer.ui.view.apkdetails.ApkDetailsView;
 
+@Push
 @SpringView
 public class AnalyzeView extends AnalyzeViewDesign implements View{
 	
@@ -51,13 +58,14 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 	private final ApkService apkService;
 	private final AnalyzeService analyzeService;
 	private final Uploader uploader;
-
+	private final UserService userService;
 	
 	@Autowired
-	public AnalyzeView(NavigationManager navigationManager, ApkService apkService,AnalyzeService analyzeService) {
+	public AnalyzeView(UserService userService,NavigationManager navigationManager, ApkService apkService,AnalyzeService analyzeService) {
 		this.navigationManager = navigationManager;
 		this.apkService=apkService;
 		this.analyzeService=analyzeService;
+		this.userService= userService;
 		uploader=new Uploader();
 		
 	}
@@ -68,6 +76,8 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 		setWidth("100%");
 		upload.setReceiver(uploader);
 		upload.addSucceededListener(uploader);
+		upload.addProgressListener(uploader);
+		progressBar.setCaption("Uploading...");
 
 	}
 	
@@ -76,7 +86,7 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 		navigationManager.navigateTo(ApkDetailsView.class, apkmodel.getId());
 	}
 	
-	class Uploader implements Receiver, SucceededListener {
+	class Uploader implements Receiver, SucceededListener,ProgressListener {
 
 		public File file;
 
@@ -86,7 +96,6 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 
 		@Override
 		public OutputStream receiveUpload(String filename, String mimeType) {
-			System.out.println("Uploading file: "+filename);
 			if (!mimeType.equalsIgnoreCase("application/vnd.android.package-archive")) {
 				new Notification("Wrong file type. Please upload an apk.", Notification.Type.ERROR_MESSAGE)
 				.show(Page.getCurrent());
@@ -118,21 +127,43 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 		
 		@Override
 		public void uploadSucceeded(SucceededEvent event) {
-			// TODO Auto-generated method stub
-			System.out.println("Analyzing "+file.getAbsolutePath());
+			progressBar.setCaption("Analyzing APK...");
+			
 			String sha256=Hash.SHA256.getHash(file);
 			ApkModel apkmodel=apkService.getRepository().findBySha256(sha256);
 			if (apkmodel==null) {
 				System.out.println("APK not in DB, adding...");
-				analyzeService.analyzeAndSaveAPK(file);
-			}
+				User current=SecurityUtils.getCurrentUser(userService);
+				analyzeService.analyzeAndSaveAPK(file,current);
+				
+				new Notification("Upload done! Analyzing APK..",  Notification.Type.ASSISTIVE_NOTIFICATION)
+				.show(Page.getCurrent());
+			}else {
 			new Notification("Apk uploaded and analyzed!",  Notification.Type.ASSISTIVE_NOTIFICATION)
 			.show(Page.getCurrent());
 			apkmodel=apkService.getRepository().findBySha256(sha256);
+			System.out.println("Score: "+analyzeService.calculateScore(apkmodel));
 			selectedApk(apkmodel);
+			}
 			
-			file.delete();
+			
 		}
+		
+		@Override
+        public void updateProgress(long readBytes, long contentLength) {
+			progressBar.setVisible(true);
+            if (contentLength == -1)
+            	progressBar.setIndeterminate(true);
+            else {
+            	progressBar.setIndeterminate(false);
+      
+            	progressBar.setValue(((float)readBytes) /
+                                  ((float)contentLength));
+            }
+        }
+		
+		
+		
 		
 	}
 }
