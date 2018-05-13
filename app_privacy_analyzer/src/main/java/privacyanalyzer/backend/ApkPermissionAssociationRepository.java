@@ -2,6 +2,7 @@ package privacyanalyzer.backend;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -30,4 +31,33 @@ public interface ApkPermissionAssociationRepository extends JpaRepository<ApkPer
 	
 	
 	List<ApkPermissionAssociation> findByApk(ApkModel apk);
+	
+	
+	@Query("SELECT ap.permission, count(*)" + 
+			" FROM ApkPermissionAssociation ap" + 
+			" WHERE ap.permissionType <> 'LibraryPermission'" + 
+			" GROUP BY ap.permission" + 
+			" ORDER BY count(*) DESC ")
+	List<Permission> findTop10UsedPermissions(Pageable pageable);
+	
+		@Query("SELECT ap.permission, count(*)" + 
+			" FROM ApkPermissionAssociation ap" +  
+			" GROUP BY ap.permission" + 
+			" ORDER BY count(*) DESC ")
+	List<Object[]> findTopUsedPermissions(Pageable pageable);
+	
+	@Query("SELECT ap.permission, count(*)" + 
+			" FROM ApkPermissionAssociation ap" +
+			" WHERE ap.permission.protectionlvl.name = 'dangerous'"+
+			" GROUP BY ap.permission" + 
+			" ORDER BY count(*) DESC ")
+	List<Permission> findTopUsedDangerousPermissions(Pageable pageable);
+	
+	@Query("SELECT ap.permissionType, count(*)"+ 
+			" FROM ApkPermissionAssociation ap"+ 
+			" WHERE ap.permission=:#{[0]}" + 
+			" GROUP BY ap.permission,ap.permissionType" + 
+			" ORDER BY count(ap.permissionType) DESC")
+	List<Object[]> getPermissionIdentifications(Permission p);
+	
 }

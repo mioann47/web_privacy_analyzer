@@ -21,4 +21,15 @@ public interface ApkRepository extends JpaRepository<ApkModel, Long> {
 	ApkModel findBySha256(String sha256);
 	
 	ApkModel findById(Long id);
+	
+	List<ApkModel> findAllByOrderByIdDesc();
+	
+	@Query("SELECT COUNT(*) FROM ApkInfo apk where apk.isMalware=1 OR apk.score>=60")
+	long findDangerousApk();
+	
+	@Query("SELECT apk FROM ApkInfo apk WHERE DATE(apk.createdAt) = CURDATE()")
+	List<ApkModel> findTodayAddedAPKs();
+	
+	
+	
 }

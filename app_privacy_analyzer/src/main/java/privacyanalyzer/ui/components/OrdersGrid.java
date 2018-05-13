@@ -39,6 +39,7 @@ public class OrdersGrid extends Grid<Order> {
 				order -> twoRowCell(getTimeHeader(order.getDueDate()), String.valueOf(order.getDueTime())),
 				new HtmlRenderer());
 		dueColumn.setSortProperty("dueDate", "dueTime");
+		
 		dueColumn.setStyleGenerator(order -> "due");
 
 		// Summary column

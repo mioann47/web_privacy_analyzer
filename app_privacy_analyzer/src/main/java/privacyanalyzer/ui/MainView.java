@@ -20,6 +20,7 @@ import privacyanalyzer.backend.data.entity.User;
 import privacyanalyzer.backend.service.UserService;
 import privacyanalyzer.ui.navigation.NavigationManager;
 import privacyanalyzer.ui.view.about.AboutView;
+import privacyanalyzer.ui.view.admin.analyze.AdminAnalyzeView;
 import privacyanalyzer.ui.view.admin.product.ProductAdminView;
 import privacyanalyzer.ui.view.admin.user.UserAdminView;
 import privacyanalyzer.ui.view.analyze.AnalyzeView;
@@ -66,7 +67,7 @@ public class MainView extends MainViewDesign implements ViewDisplay {
 		attachNavigation(users, UserAdminView.class);
 		attachNavigation(products, ProductAdminView.class);
 		attachNavigation(about, AboutView.class);
-
+		attachNavigation(adminAnalyze,AdminAnalyzeView.class);
 		attachOnly(logout, LogoutView.class);
 		logout.addClickListener(e -> logout());
 		attachOnly(loginregister, LoginRegisterView.class);

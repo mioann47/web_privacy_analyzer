@@ -6,14 +6,18 @@ import java.time.MonthDay;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
@@ -30,11 +34,19 @@ import com.vaadin.board.Row;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.Notification;
+
 import privacyanalyzer.backend.data.DashboardData;
 import privacyanalyzer.backend.data.DeliveryStats;
 import privacyanalyzer.backend.data.entity.Order;
+import privacyanalyzer.backend.data.entity.Permission;
 import privacyanalyzer.backend.data.entity.Product;
+import privacyanalyzer.backend.service.ApkService;
 import privacyanalyzer.backend.service.OrderService;
+import privacyanalyzer.backend.service.PermissionService;
 import privacyanalyzer.ui.components.OrdersGrid;
 import privacyanalyzer.ui.navigation.NavigationManager;
 import privacyanalyzer.ui.view.orderedit.OrderEditView;
@@ -56,55 +68,105 @@ public class DashboardView extends DashboardViewDesign implements View {
 	private final NavigationManager navigationManager;
 	private final OrderService orderService;
 
-	private final BoardLabel todayLabel = new BoardLabel("Today", "3/7", "today");
-	private final BoardLabel notAvailableLabel = new BoardLabel("N/A", "1", "na");
-	private final BoardBox notAvailableBox = new BoardBox(notAvailableLabel);
-	private final BoardLabel newLabel = new BoardLabel("New", "2", "new");
-	private final BoardLabel tomorrowLabel = new BoardLabel("Tomorrow", "4", "tomorrow");
-
-	private final Chart deliveriesThisMonthGraph = new Chart(ChartType.COLUMN);
+	private final BoardLabel totalAPKlabel = new BoardLabel("APKs analyzed", "3/7", "today");
+	private final BoardLabel DangerousAPKslabel = new BoardLabel("Dangerous APKs found", "1", "na");
+	private final BoardBox notAvailableBox = new BoardBox(DangerousAPKslabel);
+	private final BoardLabel addedTodayLabel = new BoardLabel("Added Today", "2", "new");
+	//private final BoardLabel tomorrowLabel = new BoardLabel("Tomorrow", "4", "tomorrow");
+	private final BoardLabel DangerousPermissionlabel = new BoardLabel("Most Used Dangerous Permission", "1", "na");
+	//private final Chart deliveriesThisMonthGraph = new Chart(ChartType.COLUMN);
 	private final Chart deliveriesThisYearGraph = new Chart(ChartType.COLUMN);
 	private final Chart yearlySalesGraph = new Chart(ChartType.AREA);
 	private final Chart monthlyProductSplit = new Chart(ChartType.PIE);
 	private final OrdersGrid dueGrid;
 
+	private final Chart permissionPieChart= new Chart(ChartType.PIE);
+	
+	public NativeSelect<Permission> select=new NativeSelect<Permission>();
 	private ListSeries deliveriesThisMonthSeries;
 	private ListSeries deliveriesThisYearSeries;
 	private ListSeries[] salesPerYear;
 
 	private DataSeries deliveriesPerProductSeries;
 
+	private final ApkService apkService;
+	private final PermissionService permissionService;
 	@Autowired
-	public DashboardView(NavigationManager navigationManager, OrderService orderService, OrdersGrid dueGrid) {
+	public DashboardView(PermissionService permissionService,ApkService apkService,NavigationManager navigationManager, OrderService orderService, OrdersGrid dueGrid) {
 		this.navigationManager = navigationManager;
 		this.orderService = orderService;
 		this.dueGrid = dueGrid;
+		this.apkService=apkService;
+		this.permissionService=permissionService;
 	}
 
+	
+
+	
+	private Long convertToLong(Object o){
+        String stringToConvert = String.valueOf(o);
+        Long convertedLong = Long.parseLong(stringToConvert);
+        return convertedLong;
+
+    }
+	Component bar;
 	@PostConstruct
 	public void init() {
+		select.clear();
+		select.setItems(permissionService.getPermissionRepository().findAll());
+		select.setEmptySelectionAllowed(false);
+		// Show 5 items and a scrollbar if there are more
+		select.setVisibleItemCount(8);
+		select.setSizeFull();
+		select.setSelectedItem(permissionService.getPermissionRepository().findAll().get(0));
+		select.addValueChangeListener(event -> {
+		    Optional<Permission> selected =  select.getSelectedItem();
+		    
+		    List<Object[]> r=permissionService.getApkPermissionAssociationRepository().getPermissionIdentifications(selected.get());
+		    refreshPie(r);
+		   /* System.out.println("Permission: "+selected.get());
+		    //initProductSplitMonthlyGraph(r);
+		    for (Object[] temp:r) {
+		    	
+		    		deliveriesPerProductSeries.add(new DataSeriesItem((String) temp[0], Integer.parseInt((String.valueOf(temp[1]) ))));
+		    		System.out.println("perm: "+(String) temp[0]+"int: "+Integer.parseInt((String.valueOf(temp[1]) )));
+		    	
+		    	
+		    }
+		    //Notification.show(selected.get() + " items.");
+		    
+		    for (DataSeriesItem d:deliveriesPerProductSeries.getData()) {
+		    	
+		    	System.out.println(d.toString());
+		    }*/
+		});
+		bar =new BasicBar(permissionService.getApkPermissionAssociationRepository().findTopUsedPermissions(new PageRequest(0, 5))).getChart();
+		
+		for (Object[] p:permissionService.getApkPermissionAssociationRepository().findTopUsedPermissions(new PageRequest(0, 5))) {
+			System.out.println(((Permission) p[0]).getPermissionName()+" found: "+convertToLong(p[1]));
+		}
 		setResponsive(true);
 
-		Row row = board.addRow(new BoardBox(todayLabel), notAvailableBox, new BoardBox(newLabel),
-				new BoardBox(tomorrowLabel));
+		Row row = board.addRow(new BoardBox(totalAPKlabel), notAvailableBox, new BoardBox(addedTodayLabel)
+				/*,new BoardBox(tomorrowLabel)*/);
 		row.addStyleName("board-row-group");
 
-		row = board.addRow(new BoardBox(deliveriesThisMonthGraph), new BoardBox(deliveriesThisYearGraph));
+		row = board.addRow(/*new BoardBox(bar),*/ new BoardBox(DangerousPermissionlabel));
+		row.addStyleName("board-row-group");
+
+		row = board.addRow(new BoardBox(bar));
 		row.addStyleName(BOARD_ROW_PANELS);
 
-		row = board.addRow(new BoardBox(yearlySalesGraph));
+		row = board.addRow(new BoardBox(permissionPieChart), new BoardBox(select));
 		row.addStyleName(BOARD_ROW_PANELS);
-
-		row = board.addRow(new BoardBox(monthlyProductSplit), new BoardBox(dueGrid, "due-grid"));
-		row.addStyleName(BOARD_ROW_PANELS);
-
-		initDeliveriesGraphs();
 		initProductSplitMonthlyGraph();
+		initTop10UsedPermissions();
 		initYearlySalesGraph();
-
+		initMyChart();
 		dueGrid.setId("dueGrid");
 		dueGrid.setSizeFull();
-
+		refreshPie(permissionService.getApkPermissionAssociationRepository().getPermissionIdentifications(permissionService.getPermissionRepository().findAll().get(0)));
+		
 		dueGrid.addSelectionListener(e -> selectedOrder(e.getFirstSelectedItem().get()));
 	}
 
@@ -132,28 +194,56 @@ public class DashboardView extends DashboardViewDesign implements View {
 		conf.getyAxis().setTitle("");
 
 	}
-
+	
+	
+	private void refreshPie(List<Object[]> data) {
+		pieData= new DataSeries("Type");
+		for (Object[] temp:data) {
+	    	
+			pieData.add(new DataSeriesItem((String) temp[0], Integer.parseInt((String.valueOf(temp[1]) ))));
+    		System.out.println("perm: "+(String) temp[0]+"int: "+Integer.parseInt((String.valueOf(temp[1]) )));
+    	
+    	
+    }
+		permissionPieChart.getConfiguration().setSeries(pieData);
+		permissionPieChart.drawChart();
+	}
+	
+	public DataSeries pieData;
+	private void initMyChart() {
+		permissionPieChart.setId("permissionPie");
+		permissionPieChart.setSizeFull();
+		
+		Configuration conf= permissionPieChart.getConfiguration();
+		conf.setTitle("Permission Identification Usage");
+		pieData=new DataSeries("Used");
+		conf.addSeries(pieData);
+		conf.getyAxis().setTitle("");
+		
+	}
 	private void initProductSplitMonthlyGraph() {
 		monthlyProductSplit.setId("monthlyProductSplit");
 		monthlyProductSplit.setSizeFull();
-
+		
+		
 		LocalDate today = LocalDate.now();
 
 		Configuration conf = monthlyProductSplit.getConfiguration();
 		String thisMonth = today.getMonth().getDisplayName(TextStyle.FULL, Locale.US);
 		conf.setTitle("Products delivered in " + thisMonth);
 		deliveriesPerProductSeries = new DataSeries(DELIVERIES);
+		
+		
 		conf.addSeries(deliveriesPerProductSeries);
-
 		conf.getyAxis().setTitle("");
 
 	}
 
-	private void initDeliveriesGraphs() {
+	private void initTop10UsedPermissions() {
 		LocalDate today = LocalDate.now();
 
-		deliveriesThisMonthGraph.setId("deliveriesThisMonth");
-		deliveriesThisMonthGraph.setSizeFull();
+		//deliveriesThisMonthGraph.setId("deliveriesThisMonth");
+		//deliveriesThisMonthGraph.setSizeFull();
 
 		deliveriesThisYearGraph.setId("deliveriesThisYear");
 		deliveriesThisYearGraph.setSizeFull();
@@ -169,7 +259,7 @@ public class DashboardView extends DashboardViewDesign implements View {
 		yearConf.addSeries(deliveriesThisYearSeries);
 		configureColumnSeries(deliveriesThisYearSeries);
 
-		Configuration monthConf = deliveriesThisMonthGraph.getConfiguration();
+		/*Configuration monthConf = deliveriesThisMonthGraph.getConfiguration();
 		String thisMonth = today.getMonth().getDisplayName(TextStyle.FULL, Locale.US);
 		monthConf.setTitle("Deliveries in " + thisMonth);
 		monthConf.getChart().setMarginBottom(6);
@@ -182,7 +272,7 @@ public class DashboardView extends DashboardViewDesign implements View {
 		String[] categories = IntStream.rangeClosed(1, daysInMonth).mapToObj(Integer::toString)
 				.toArray(size -> new String[size]);
 		monthConf.getxAxis().setCategories(categories);
-		monthConf.getxAxis().setLabels(new Labels(false));
+		monthConf.getxAxis().setLabels(new Labels(false));*/
 	}
 
 	protected void configureColumnSeries(ListSeries series) {
@@ -214,7 +304,7 @@ public class DashboardView extends DashboardViewDesign implements View {
 	}
 
 	private void updateGraphs(DashboardData data) {
-		deliveriesThisMonthSeries.setData(data.getDeliveriesThisMonth());
+		//deliveriesThisMonthSeries.setData(data.getDeliveriesThisMonth());
 		deliveriesThisYearSeries.setData(data.getDeliveriesThisYear());
 
 		for (int i = 0; i < 3; i++) {
@@ -227,11 +317,14 @@ public class DashboardView extends DashboardViewDesign implements View {
 	}
 
 	private void updateLabels(DeliveryStats deliveryStats) {
-		todayLabel.setContent(deliveryStats.getDeliveredToday() + "/" + deliveryStats.getDueToday());
-		notAvailableLabel.setContent(Integer.toString(deliveryStats.getNotAvailableToday()));
+		totalAPKlabel.setContent(Long.toString(apkService.getRepository().count()));
+		DangerousAPKslabel.setContent(Long.toString(apkService.getRepository().findDangerousApk()));
 		notAvailableBox.setNeedsAttention(deliveryStats.getNotAvailableToday() > 0);
-		newLabel.setContent(Integer.toString(deliveryStats.getNewOrders()));
-		tomorrowLabel.setContent(Integer.toString(deliveryStats.getDueTomorrow()));
+		addedTodayLabel.setContent(Integer.toString(apkService.getRepository().findTodayAddedAPKs().size()));
+		//tomorrowLabel.setContent(Integer.toString(deliveryStats.getDueTomorrow()));
+		System.out.println();
+		Permission p=permissionService.getApkPermissionAssociationRepository().findTopUsedDangerousPermissions(new PageRequest(0, 1)).get(0);
+		DangerousPermissionlabel.setContent(p.getPermissionName());
 	}
 
 	/**

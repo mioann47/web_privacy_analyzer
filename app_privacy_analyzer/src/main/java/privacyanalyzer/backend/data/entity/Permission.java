@@ -119,6 +119,9 @@ public class Permission extends MyAbstractEntity{
 	
 	
 	
-	
+	@Override
+	public String toString() {
+		return this.permissionName;
+	}
 	
 }

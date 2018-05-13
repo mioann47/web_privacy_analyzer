@@ -13516,6 +13516,28 @@ div.v-layout.v-horizontal.v-widget {
 	display: none;
 }
 
+.apptheme .vitustotallabelred {
+	border: 1px solid #EE1010;
+	background: white;
+	border-radius: 50px;
+	color: #EE1010;
+	font-size: 22px;
+	height: 50px;
+	line-height: 40px;
+	text-align: center;
+}
+
+.apptheme .vitustotallabelgreen {
+	border: 1px solid #2c9020;
+	background: white;
+	border-radius: 50px;
+	color: #2c9020;
+	font-size: 22px;
+	height: 50px;
+	line-height: 40px;
+	text-align: center;
+}
+
 .apptheme .v-errorindicator {
 	display: none;
 }

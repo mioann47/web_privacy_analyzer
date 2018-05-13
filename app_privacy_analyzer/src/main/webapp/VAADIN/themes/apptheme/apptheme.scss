@@ -62,7 +62,29 @@ $app-background-image: url('bg.jpg');
 		$v-selection-color: #EE1010;
   @include valo-progressbar(redpbar);
 	
+.vitustotallabelred {
+    border: 1px solid #EE1010;
+    background: white;
+    border-radius: 50px;
+    color:#EE1010;
+    font-size: 22px;
+    height: 50px;
+  	line-height: 40px;
+    text-align: center;
+    
+}
 
+.vitustotallabelgreen {
+    border: 1px solid #2c9020;
+    background: white;
+    border-radius: 50px;
+    color:#2c9020;
+    font-size: 22px;
+    height: 50px;
+  	line-height: 40px;
+    text-align: center;
+    
+}
 
   .v-errorindicator {
     // Only show validation errors using field styles

@@ -134,7 +134,7 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 			if (apkmodel==null) {
 				System.out.println("APK not in DB, adding...");
 				User current=SecurityUtils.getCurrentUser(userService);
-				analyzeService.analyzeAndSaveAPK(file,current);
+				analyzeService.asyncAnalyzeAndSaveAPK(file,current);
 				
 				new Notification("Upload done! Analyzing APK..",  Notification.Type.ASSISTIVE_NOTIFICATION)
 				.show(Page.getCurrent());

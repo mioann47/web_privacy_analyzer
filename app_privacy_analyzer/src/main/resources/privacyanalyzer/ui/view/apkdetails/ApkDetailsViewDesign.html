@@ -45,6 +45,12 @@
          Status: Analyzing APK... 
        </vaadin-label>
        <vaadin-progress-bar caption-as-html caption="<center>APK risk score: 99.99/100</center>" primary-style-name="greenpbar" width="85%" _id="scoreBar" :center></vaadin-progress-bar>
+       <vaadin-label caption="Results by VirusTotal.com:" _id="virusTotalLabel" :center>
+         text 
+       </vaadin-label>
+       <vaadin-label primary-style-name="vitustotallabelgreen" width="86px" height="44px" plain-text _id="virusTotalNumberLabel" :center>
+         66/66 
+       </vaadin-label>
       </vaadin-vertical-layout>
      </vaadin-vertical-layout>
      <vaadin-vertical-layout margin="false">
@@ -80,10 +86,10 @@
         <vaadin-label height="26px" plain-text _id="minSDK">
           Minimum SDK: 
         </vaadin-label>
-        <vaadin-label height="26px" plain-text _id="targetSDK">
-          Target SDK: 
-        </vaadin-label>
        </vaadin-horizontal-layout>
+       <vaadin-label height="26px" plain-text _id="targetSDK">
+         Target SDK: 
+       </vaadin-label>
        <vaadin-css-layout style-name="order-form responsive" width-full>
         <vaadin-label style-name="header" width-full plain-text>
           Other Information: 
@@ -91,8 +97,8 @@
        </vaadin-css-layout>
        <vaadin-horizontal-layout width-full>
         <vaadin-check-box caption="ADB Backup" description="ADB Backup is a good tool for backing up all of your files. If it's open for this app, people who have your phone can copy all of the sensitive data for this app in your phone. The sensitive data may include lifetime access token, username or password, etc." readonly _id="adbCheckBox"></vaadin-check-box>
-        <vaadin-check-box caption="Debuggable" description="This is very dangerous. The attackers will be able to sniffer the debug messages by Logcat." readonly _id="debugCheckBox"></vaadin-check-box>
        </vaadin-horizontal-layout>
+       <vaadin-check-box caption="Debuggable" description="This is very dangerous. The attackers will be able to sniffer the debug messages by Logcat." readonly _id="debugCheckBox"></vaadin-check-box>
       </vaadin-vertical-layout>
      </vaadin-vertical-layout>
     </vaadin-horizontal-layout>

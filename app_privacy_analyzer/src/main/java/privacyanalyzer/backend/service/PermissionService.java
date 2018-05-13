@@ -175,4 +175,8 @@ public class PermissionService implements Serializable{
 		}
 	}
 
+	public PermissionRepository getPermissionRepository() {
+		return permissionRepository;
+	}
+
 }

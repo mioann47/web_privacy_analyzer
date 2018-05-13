@@ -31,6 +31,8 @@ public class ApkDetailsViewDesign extends VerticalLayout {
 	protected Image image;
 	protected Label statusLabel;
 	protected ProgressBar scoreBar;
+	protected Label virusTotalLabel;
+	protected Label virusTotalNumberLabel;
 	protected Label sha256;
 	protected Label packageName;
 	protected Label packageVersionName;

@@ -34,7 +34,8 @@ public class ApkListView extends ApkListDesign implements View {
 	@PostConstruct
 	public void init() {
 
-		list.setItems(apkRepository.findAll());
+		list.setItems(apkRepository.findAllByOrderByIdDesc());
+	
 		list.addSelectionListener(e -> selectedApk(e.getFirstSelectedItem().get()));
 
 		// this.searchField.addValueChangeListener(this::onNameFilterTextChange);
