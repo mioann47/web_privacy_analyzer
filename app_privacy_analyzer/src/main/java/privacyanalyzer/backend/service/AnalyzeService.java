@@ -86,7 +86,10 @@ public class AnalyzeService extends APKAnalyzer implements Serializable {
 					VirusTotalReportResponse report=this.virusTotal.requestReportBySHA256(apkmodel.getSha256());
 					code=report.getResponseCode();
 					if (code==1) { System.out.println("APK exists in VirusTotal DB"); return;}
+					int count=0;
 					while (code==204) {
+						count++;
+						if (count>10) {System.out.println("10 mins slept, still problem.. exiting..");return;}
 						System.out.println("VirusTotal API overused... sleeping for 1min...");
 						TimeUnit.MINUTES.sleep(1);
 						report=this.virusTotal.requestReportBySHA256(apkmodel.getSha256());
@@ -98,7 +101,10 @@ public class AnalyzeService extends APKAnalyzer implements Serializable {
 
 					VirusTotalUploadResponse vtur=this.virusTotal.uploadAndScanAPK(file.getAbsolutePath());
 					code=vtur.getResponseCode();
+					count=0;
 					while (code==204) {
+						count++;
+						if (count>10) {System.out.println("10 mins slept, still problem.. exiting..");return;}
 						System.out.println("VirusTotal API overused... sleeping for 1min...");
 						TimeUnit.MINUTES.sleep(1);
 						vtur=this.virusTotal.uploadAndScanAPK(file.getAbsolutePath());

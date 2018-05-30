@@ -9,27 +9,32 @@
   vaadin-board {
     padding: $padding;
 
+
     vaadin-board-row:nth-child(2) > .board-box-wrapper {
-      height: calc(20vh - $first-row-compensation) !important;
-      min-height: 150px;
-    }
-    vaadin-board-row:nth-child(3) > .board-box-wrapper {
       height: calc(40vh - $first-row-compensation) !important;
       min-height: 200px;
     }
-    vaadin-board-row:nth-child(4) {
+    vaadin-board-row:nth-child(3) {
       height: calc(40vh - $first-row-compensation);
       min-height: 200px;
     }
+    
+
+            vaadin-board-row:nth-child(5) {
+      height: calc(80vh - $first-row-compensation );
+      min-height: 200px;
+    }
+
 
     vaadin-board-row.medium:nth-child(2) > .board-box-wrapper {
-      height: calc(20vh - $first-row-compensation * 2) !important;
-    }
-    vaadin-board-row.medium:nth-child(3) > .board-box-wrapper {
       height: calc(40vh - $first-row-compensation * 2) !important;
     }
-    vaadin-board-row.medium:nth-child(4) {
+    vaadin-board-row.medium:nth-child(3) {
       height: calc(40vh - $first-row-compensation * 2);
+    }
+
+            vaadin-board-row.medium:nth-child(5) {
+      height: calc(80vh - $first-row-compensation * 2);
     }
 
     .board-box {

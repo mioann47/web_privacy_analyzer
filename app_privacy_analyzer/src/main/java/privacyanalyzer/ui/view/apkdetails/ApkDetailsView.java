@@ -206,14 +206,23 @@ public class ApkDetailsView extends ApkDetailsViewDesign implements View {
 
 			if (mal) {
 				resource = new FileResource(new File(basepath + "/VAADIN/images/malware.png"));
-				statusLabel.setValue("Status: APK might be SUSPICIOUS!");
+				statusLabel.setValue("Status: APK might be Dangerous!");
+				statusLabel.setDescription("This result is based on permissions. "
+						+ "This APK looks suspicious because it uses some permissions dangerous/signature. "
+						+ "This does not mean that the APK is harmful but it indicates that the APK might be "
+						+ "able to get sensitive data from the user device");
 				
 			} else {
 				resource = new FileResource(new File(basepath + "/VAADIN/images/clean.png"));
-				statusLabel.setValue("Status: No suspicious activity found!");
+				statusLabel.setValue("Status: No dangerous activity found!");
+				statusLabel.setDescription("This result is based on permissions. "
+						+ "This APK looks non-harmful. "
+						+ "This does not mean that the APK is not a malware but it indicates "
+						+ "that the permissions that are used (or no permission is used) are not "
+						+ "dangerous enough to get sensitive data from the user device.");
 			}
 		}
-		statusLabel.setDescription("This result is based on permissions.");
+		
 		image.setDescription("This result is based on permissions.");
 		this.image.setSource(resource);
 		image.setWidth(100, Unit.PIXELS);

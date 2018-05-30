@@ -12,9 +12,9 @@ public class ChartsTheme extends Theme {
 	private static final SolidColor COLOR1 = new SolidColor("#a56284");
 	private static final SolidColor COLOR2 = new SolidColor("#6c6c93");
 	private static final SolidColor COLOR3 = new SolidColor("#fb991c");
-
+	private static final SolidColor COLOR4 = new SolidColor("#A3D3F8");
 	public ChartsTheme() {
-		setColors(COLOR1, COLOR2, COLOR3);
+		setColors(COLOR1, COLOR2, COLOR3,COLOR4);
 		getTitle().setColor(COLOR1);
 		getTitle().setFontSize("inherit"); // inherit from CSS
 	}

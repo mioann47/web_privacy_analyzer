@@ -25,9 +25,11 @@ import privacyanalyzer.backend.data.entity.Permission;
 public class BasicBar extends AbstractVaadinChartExample {
 
 	List<Object[]> data;
-	public BasicBar(List<Object[]> data) {
+	String title;
+	public BasicBar(List<Object[]> data,String title) {
 		super();
 		this.data=data;
+		this.title=title;
 	}
 	
 	
@@ -42,7 +44,7 @@ public class BasicBar extends AbstractVaadinChartExample {
         chart.setSizeFull();
         Configuration conf = chart.getConfiguration();
 
-        conf.setTitle("5 Most Used IDENTIFIED permissions");
+        conf.setTitle(this.title);
 
         XAxis x = new XAxis();
         //x.setCategories("Africa", "America", "Asia", "Europe", "Oceania");

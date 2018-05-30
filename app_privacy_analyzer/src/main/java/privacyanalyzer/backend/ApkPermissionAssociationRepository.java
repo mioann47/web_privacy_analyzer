@@ -41,23 +41,39 @@ public interface ApkPermissionAssociationRepository extends JpaRepository<ApkPer
 	List<Permission> findTop10UsedPermissions(Pageable pageable);
 	
 		@Query("SELECT ap.permission, count(*)" + 
-			" FROM ApkPermissionAssociation ap" +  
+			" FROM ApkPermissionAssociation ap" +
+			" WHERE ap.permissionType <> 'Declared'" + 
 			" GROUP BY ap.permission" + 
 			" ORDER BY count(*) DESC ")
 	List<Object[]> findTopUsedPermissions(Pageable pageable);
 	
 	@Query("SELECT ap.permission, count(*)" + 
 			" FROM ApkPermissionAssociation ap" +
-			" WHERE ap.permission.protectionlvl.name = 'dangerous'"+
+			" WHERE ap.permission.protectionlvl.name = 'dangerous' AND ap.permissionType <> 'Declared'"+
 			" GROUP BY ap.permission" + 
 			" ORDER BY count(*) DESC ")
-	List<Permission> findTopUsedDangerousPermissions(Pageable pageable);
+	List<Permission> findTop10UsedDangerousPermissions(Pageable pageable);
+	
+	@Query("SELECT ap.permission, count(*)" + 
+			" FROM ApkPermissionAssociation ap" +
+			" WHERE ap.permission.protectionlvl.name = 'dangerous' AND ap.permissionType <> 'Declared'"+
+			" GROUP BY ap.permission" + 
+			" ORDER BY count(*) DESC ")
+	List<Object[]> findTopUsedDangerousPermissions(Pageable pageable);
 	
 	@Query("SELECT ap.permissionType, count(*)"+ 
 			" FROM ApkPermissionAssociation ap"+ 
-			" WHERE ap.permission=:#{[0]}" + 
+			" WHERE ap.permission=:#{[0]} AND ap.permissionType <> 'Declared'" + 
 			" GROUP BY ap.permission,ap.permissionType" + 
 			" ORDER BY count(ap.permissionType) DESC")
 	List<Object[]> getPermissionIdentifications(Permission p);
 	
+	
+	
+	@Query("SELECT ap.permissionType, count(*)" + 
+			" FROM ApkPermissionAssociation ap" +
+			" WHERE ap.permissionType <> 'Declared'" + 
+			" GROUP BY ap.permissionType" + 
+			" ORDER BY count(*) DESC ")
+	List<Object[]> findAllTypesCount();
 }
