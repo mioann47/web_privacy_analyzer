@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import privacyanalyzer.backend.data.OrderState;
 import privacyanalyzer.backend.data.entity.ApkModel;
 
 public interface ApkRepository extends JpaRepository<ApkModel, Long> {
@@ -30,6 +29,7 @@ public interface ApkRepository extends JpaRepository<ApkModel, Long> {
 	@Query("SELECT apk FROM ApkInfo apk WHERE DATE(apk.createdAt) = CURDATE()")
 	List<ApkModel> findTodayAddedAPKs();
 	
-	
+	@Query("SELECT AVG(apk.score) FROM ApkInfo apk")
+	float getAverageScore();
 	
 }

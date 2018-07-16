@@ -106,6 +106,13 @@ public class PermissionService implements Serializable{
 		
 		grid.removeAllColumns();
 		grid.setSelectionMode(Grid.SelectionMode.NONE);
+		
+		if (permissionlist.size()==0) {
+			grid.addColumn(Permission::getPermissionName).setCaption("No permissions found");
+			grid.setHeightByRows(1);
+			return;
+		}
+		
 		Column<Permission, String> permNameColumn =grid.addColumn(Permission::getPermissionName).setCaption("Permission Name")
 				.setDescriptionGenerator(Permission::getPermissionDesc);
 		Column<Permission, String> permValueColumn = grid.addColumn(Permission::getPermissionValue).setCaption("Permission Value")

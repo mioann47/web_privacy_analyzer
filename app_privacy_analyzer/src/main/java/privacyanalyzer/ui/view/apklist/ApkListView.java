@@ -12,11 +12,11 @@ import com.vaadin.ui.renderers.ImageRenderer;
 
 import privacyanalyzer.backend.ApkRepository;
 import privacyanalyzer.backend.data.entity.ApkModel;
-import privacyanalyzer.backend.data.entity.Order;
+
 import privacyanalyzer.ui.navigation.NavigationManager;
 import privacyanalyzer.ui.view.analyze.AnalyzeView;
 import privacyanalyzer.ui.view.apkdetails.ApkDetailsView;
-import privacyanalyzer.ui.view.orderedit.OrderEditView;
+
 
 @SpringView
 public class ApkListView extends ApkListDesign implements View {

@@ -11,7 +11,6 @@ import com.vaadin.spring.navigator.SpringNavigator;
 import privacyanalyzer.app.security.SecurityUtils;
 import privacyanalyzer.backend.data.Role;
 import privacyanalyzer.ui.view.dashboard.DashboardView;
-import privacyanalyzer.ui.view.storefront.StorefrontView;
 import privacyanalyzer.ui.view.analyze.*;
 
 /**

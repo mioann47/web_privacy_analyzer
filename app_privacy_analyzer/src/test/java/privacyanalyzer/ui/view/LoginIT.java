@@ -17,7 +17,7 @@ public class LoginIT extends AbstractIT {
 
 	@Test
 	public void logoutWorks() {
-		loginAsBarista();
+	//	loginAsBarista();
 		$(MenuElement.class).first().logout();
 		Assert.assertEquals("Email", findElement(By.id("login-label")).getText());
 	}

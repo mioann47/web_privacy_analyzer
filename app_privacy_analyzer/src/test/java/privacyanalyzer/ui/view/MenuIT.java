@@ -17,7 +17,7 @@ public class MenuIT extends AbstractIT {
 
 	@Test
 	public void baristaDoesNotSeeAdminMenus() {
-		loginAsBarista();
+		//loginAsBarista();
 		MenuElement menu = $(MenuElement.class).first();
 		Assert.assertNull(menu.getMenuLink("Users"));
 		Assert.assertNull(menu.getMenuLink("Products"));

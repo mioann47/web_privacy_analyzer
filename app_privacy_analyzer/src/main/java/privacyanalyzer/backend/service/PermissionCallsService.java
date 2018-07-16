@@ -10,10 +10,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
+import com.vaadin.data.HasValue.ValueChangeEvent;
+import com.vaadin.data.HasValue.ValueChangeListener;
+import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.Grid.Column;
+import com.vaadin.ui.components.grid.HeaderRow;
 
 import privacyanalyzer.backend.PermissionCallsRepository;
 import privacyanalyzer.backend.data.entity.ApkModel;
+import privacyanalyzer.backend.data.entity.Permission;
 import privacyanalyzer.backend.data.entity.PermissionMethodCallModel;
 
 @Service
@@ -59,9 +66,17 @@ public class PermissionCallsService extends MyCrudService<PermissionMethodCallMo
 
 	public void setGrid(ApkModel apkmodel, Grid<PermissionMethodCallModel> grid) {
 		List<PermissionMethodCallModel> list=this.permissionCallsRepository.findByApk(apkmodel);
+		
+		if (list.size()==0) {
+			grid.addColumn(PermissionMethodCallModel::getPermissionName).setCaption("No permissions found");
+			grid.setHeightByRows(1);
+			return;
+		}
+		
+		
 		grid.removeAllColumns();
 		grid.setSelectionMode(Grid.SelectionMode.NONE);
-		grid.addColumn(PermissionMethodCallModel::getName).setCaption("Permission Name");
+		Column<PermissionMethodCallModel,String> permNameColumn=grid.addColumn(PermissionMethodCallModel::getName).setCaption("Permission Name");
 		grid.addColumn(PermissionMethodCallModel::getCallerFunction)
 				.setCaption("Caller Function (package -> function)");
 		grid.addColumn(PermissionMethodCallModel::getPermissionFunction)
@@ -69,6 +84,31 @@ public class PermissionCallsService extends MyCrudService<PermissionMethodCallMo
 		grid.setItems(list);
 		//grid.setWidth("100%");
 
+		
+		TextField permNameFilter=new TextField();
+		permNameFilter.setSizeFull();
+		permNameFilter.setHeight("80%");
+		permNameFilter.setPlaceholder("Search by name...");
+		permNameFilter.addValueChangeListener(new ValueChangeListener<String>() {
+			
+			@Override
+			public void valueChange(ValueChangeEvent<String> event) {
+		        ListDataProvider<PermissionMethodCallModel> dataProvider = (ListDataProvider<PermissionMethodCallModel>) grid.getDataProvider();
+		        dataProvider.setFilter(PermissionMethodCallModel::getPermissionName, s -> caseInsensitiveContains(s, event.getValue()));
+				
+			}
+			
+		    private Boolean caseInsensitiveContains(String where, String what) {
+		        return where.toLowerCase().contains(what.toLowerCase());
+		    }
+		});
+        HeaderRow filterRow = grid.appendHeaderRow();
+       	filterRow.getCell(permNameColumn).setComponent(permNameFilter);
+		
+		
+		
+		
+		
 		if (list.size() == 0) {
 			grid.setHeightByRows(1);
 		} else if (list.size() >= 10) {

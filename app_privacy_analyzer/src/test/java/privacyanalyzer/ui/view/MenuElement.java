@@ -4,17 +4,16 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import privacyanalyzer.AbstractIT;
-import privacyanalyzer.ui.view.storefront.StorefrontViewElement;
 import com.vaadin.testbench.By;
 import com.vaadin.testbench.elements.AbstractComponentElement;
 
 public class MenuElement extends AbstractComponentElement {
 
-	public StorefrontViewElement navigateToStorefront() {
+	/*public StorefrontViewElement navigateToStorefront() {
 		WebElement menuLink = getMenuLink("Storefront");
 		menuLink.click();
 		return AbstractIT.findFirstElement(this, StorefrontViewElement.class);
-	}
+	}*/
 
 	public void logout() {
 		WebElement menuLink = getMenuLink("Log out");

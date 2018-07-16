@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import privacyanalyzer.ui.view.LoginViewElement;
 import privacyanalyzer.ui.view.dashboard.DashboardViewElement;
-import privacyanalyzer.ui.view.storefront.StorefrontViewElement;
 import com.vaadin.testbench.By;
 import com.vaadin.testbench.ElementQuery;
 import com.vaadin.testbench.HasDriver;
@@ -205,10 +204,7 @@ public class AbstractIT extends TestBenchTestCase {
 		return "";
 	}
 
-	protected StorefrontViewElement loginAsBarista() {
-		openLoginView(APP_URL).login("barista@vaadin.com", "barista");
-		return $(StorefrontViewElement.class).first();
-	}
+
 
 	protected DashboardViewElement loginAsAdmin() {
 		openLoginView(APP_URL).login("admin@vaadin.com", "admin");

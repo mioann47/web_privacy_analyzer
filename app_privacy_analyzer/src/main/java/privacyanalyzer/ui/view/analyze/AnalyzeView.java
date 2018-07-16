@@ -109,7 +109,7 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 			try {
 				directory.mkdir();
 				// Open the file for writing.
-				file = new File(directory.getAbsolutePath() + "\\" + System.currentTimeMillis() + ".apk");
+				file = new File(directory.getAbsolutePath() + "/" + System.currentTimeMillis() + ".apk");
 				// file.createNewFile();
 
 				fos = new FileOutputStream(file);
@@ -151,6 +151,15 @@ public class AnalyzeView extends AnalyzeViewDesign implements View{
 		
 		@Override
         public void updateProgress(long readBytes, long contentLength) {
+			if (contentLength > 31457280 || readBytes >31457280) {
+				Notification not= new Notification("Too large file! Max allowed APK size is 30MB.", Notification.Type.ERROR_MESSAGE);
+				not.show(Page.getCurrent());
+				
+				upload.interruptUpload();
+				progressBar.setVisible(false);
+				
+				return;
+			}
 			progressBar.setVisible(true);
             if (contentLength == -1)
             	progressBar.setIndeterminate(true);

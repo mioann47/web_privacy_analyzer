@@ -30,17 +30,24 @@ public class TrackerService implements Serializable {
 	private List<Tracker> trackerList;
 	
 	private final TrackerRepository trackerRepository;
-	private final ApkTrackerAssociationRepository apkTrackerAssociationRepository;
+	private final  ApkTrackerAssociationRepository apkTrackerAssociationRepository;
+	private final ApkService apkService;
 	
 	@Autowired
-	public TrackerService(TrackerRepository trackerRepository,ApkTrackerAssociationRepository apkTrackerAssociationRepository) {
+	public TrackerService(TrackerRepository trackerRepository,ApkTrackerAssociationRepository apkTrackerAssociationRepository,ApkService apkService) {
 		this.trackerRepository=trackerRepository;
 		this.apkTrackerAssociationRepository=apkTrackerAssociationRepository;
+		this.apkService=apkService;
 		getAllTrackers();
 	}
 	
+	public ApkTrackerAssociationRepository getApkTrackerRepo() {
+		return this.apkTrackerAssociationRepository;
+	}
 
-
+	public TrackerRepository getTrackerRepo() {
+		return this.trackerRepository;
+	}
 	
 	private void getAllTrackers() {
 		trackerList=trackerRepository.findAll();
@@ -77,6 +84,7 @@ public class TrackerService implements Serializable {
 			
 			Tracker t=exists(libModels[i].getLibrary());
 			if (t!=null) {
+				if (getApkTrackerRepo().findByApkAndTracker(apkService.getRepository().findById(apkmodel.getId()), getTrackerRepo().findById(t.getId())).size()==0)
 				apkTrackerAssociationRepository.save(new ApkTrackerAssociation(apkmodel,t));
 			}
 			
@@ -98,7 +106,11 @@ public class TrackerService implements Serializable {
 			}
 			
 		}*/
-		
+		if (mylist.size()==0) {
+			grid.addColumn(Tracker::getName).setCaption("No trackers found");
+			grid.setHeightByRows(1);
+			return;
+		}
 		grid.removeAllColumns();
 		grid.setSelectionMode(Grid.SelectionMode.NONE);
 		grid.addColumn(Tracker::getName).setCaption("Name");

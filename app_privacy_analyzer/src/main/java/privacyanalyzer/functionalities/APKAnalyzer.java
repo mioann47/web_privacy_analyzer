@@ -20,7 +20,7 @@ import privacyanalyzer.ui.util.Paths;
 public class APKAnalyzer {
 
 	public LibraryModel[] getLibrariesPermissions(String apkPath) throws IOException {
-		String run = "python " + Paths.liteRadarPath + " -f \"" + apkPath + "\"";
+		String run = "python " + Paths.liteRadarPath + " -f " + apkPath + "";
 		Process p = Runtime.getRuntime().exec(run);
 		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		StringBuilder sb = new StringBuilder();
@@ -45,7 +45,7 @@ public class APKAnalyzer {
 
 	public ApplicationPermissionsModel getAPKPermissions(String apkPath) throws IOException, InterruptedException {
 
-		String run = "java -jar " + Paths.permissionCheckerPath + " \"" + apkPath + "\"";
+		String run = "java -jar " + Paths.permissionCheckerPath + " " + apkPath + "";
 
 		Process p = Runtime.getRuntime().exec(run);
 
@@ -79,8 +79,8 @@ public class APKAnalyzer {
 
 	public ApkModel getApkInformation(String apkPath) throws IOException {
 
-		String run = "python " + Paths.pythonScript + " -m analyze -f \"" + apkPath + "\"";
-
+		String run = "python " + Paths.pythonScript + " -m analyze -f " + apkPath + "";
+		//System.out.println(run);
 		Process p = Runtime.getRuntime().exec(run);
 		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		StringBuilder sb = new StringBuilder();
@@ -88,13 +88,13 @@ public class APKAnalyzer {
 		BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 		String line = null;
 		while ((line = err.readLine()) != null) {
-			// System.out.println(line);
+			 //System.out.println("ERROR= "+line);
 			// sb.append(line + "\n");
 		}
 		line = null;
 
 		while ((line = in.readLine()) != null) {
-			// System.out.println(line);
+			 //System.out.println("LINE= "+line);
 			sb.append(line + "\n");
 		}
 
@@ -113,7 +113,7 @@ public class APKAnalyzer {
 			pList = pList + permissionList.get(i) + ",";
 		}
 
-		String run = "python " + Paths.pythonScript + " -m call -f \"" + apkPath + "\" -p " + pList;
+		String run = "python " + Paths.pythonScript + " -m call -f " + apkPath + " -p " + pList;
 		//System.out.println(run);
 		Process p = Runtime.getRuntime().exec(run);
 

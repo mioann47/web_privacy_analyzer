@@ -22,7 +22,7 @@ public class MobileIconsIT extends AbstractIT {
 
 	@Test
 	public void iconsPresentInApp() {
-		loginAsBarista();
+		//loginAsBarista();
 		List<WebElement> appleIcons = findElements(By.xpath("//link[@rel='apple-touch-icon']"));
 		Assert.assertFalse(appleIcons.isEmpty());
 		List<WebElement> otherIcons = findElements(By.xpath("//link[@rel='icon']"));
