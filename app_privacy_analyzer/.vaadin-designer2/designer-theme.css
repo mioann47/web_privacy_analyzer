@@ -13030,30 +13030,30 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .apptheme vaadin-board vaadin-board-row:nth-child(2) > .board-box-wrapper {
-	height: calc(20vh - 53px) !important;
-	min-height: 150px;
-}
-
-.apptheme vaadin-board vaadin-board-row:nth-child(3) > .board-box-wrapper {
 	height: calc(40vh - 53px) !important;
 	min-height: 200px;
 }
 
-.apptheme vaadin-board vaadin-board-row:nth-child(4) {
+.apptheme vaadin-board vaadin-board-row:nth-child(3) {
 	height: calc(40vh - 53px);
 	min-height: 200px;
 }
 
-.apptheme vaadin-board vaadin-board-row.medium:nth-child(2) > .board-box-wrapper {
-	height: calc(20vh - 53px * 2) !important;
+.apptheme vaadin-board vaadin-board-row:nth-child(5) {
+	height: calc(80vh - 53px);
+	min-height: 200px;
 }
 
-.apptheme vaadin-board vaadin-board-row.medium:nth-child(3) > .board-box-wrapper {
+.apptheme vaadin-board vaadin-board-row.medium:nth-child(2) > .board-box-wrapper {
 	height: calc(40vh - 53px * 2) !important;
 }
 
-.apptheme vaadin-board vaadin-board-row.medium:nth-child(4) {
+.apptheme vaadin-board vaadin-board-row.medium:nth-child(3) {
 	height: calc(40vh - 53px * 2);
+}
+
+.apptheme vaadin-board vaadin-board-row.medium:nth-child(5) {
+	height: calc(80vh - 53px * 2);
 }
 
 .apptheme vaadin-board .board-box {
